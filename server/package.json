@@ -1,0 +1,16 @@
+{
+  "name": "elmi-certificate-server",
+  "version": "1.0.0",
+  "description": "Puppeteer-based PDF generation service for landscape student report cards",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "puppeteer": "^24.4.0"
+  }
+}
