@@ -31,6 +31,8 @@ storybook-static/
 *.xls
 *.csv
 !public/templates/*.xlsx
+!client/public/templates/*.xlsx
+!sample-data/*.xlsx
 
 # ==========================================
 # Environment Variables & Secrets
