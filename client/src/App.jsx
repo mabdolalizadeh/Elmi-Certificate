@@ -4,6 +4,7 @@ import Header from './components/Header';
 import FileImportCard from './components/FileImportCard';
 import ControlBar from './components/ControlBar';
 import ReportCardPreviewer from './components/ReportCardPreviewer';
+import ExportModal from './components/ExportModal';
 import { SAMPLE_STUDENTS, enrichStudentData } from './utils/excelService';
 
 export default function App() {
@@ -29,7 +30,13 @@ export default function App() {
     advisor: true,
   });
 
-  const [isExporting, setIsExporting] = useState(false);
+  const [exportModalState, setExportModalState] = useState({
+    open: false,
+    status: 'loading',
+    errorMessage: '',
+    count: 0,
+  });
+
   const [notification, setNotification] = useState(null);
 
   // Available unique classes
@@ -85,7 +92,10 @@ export default function App() {
   };
 
   const handleToggleSelectAll = () => {
-    const allFilteredSelected = filteredStudents.every((s) => selectedStudentIds.includes(s.id));
+    const allFilteredSelected =
+      filteredStudents.length > 0 &&
+      filteredStudents.every((s) => selectedStudentIds.includes(s.id));
+
     if (allFilteredSelected) {
       // Deselect filtered
       const filteredIds = new Set(filteredStudents.map((s) => s.id));
@@ -108,16 +118,38 @@ export default function App() {
       return;
     }
 
-    setIsExporting(true);
+    setExportModalState({
+      open: true,
+      status: 'loading',
+      errorMessage: '',
+      count: studentsToExport.length,
+    });
+
     try {
-      const response = await fetch('http://localhost:5001/api/generate-pdf', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          students: studentsToExport,
-          visibility,
-        }),
-      });
+      // Try relative /api first (works via Vite proxy or reverse proxy), fallback to explicit 5001
+      const apiUrl = window.location.port === '5173' ? '/api/generate-pdf' : 'http://localhost:5001/api/generate-pdf';
+      let response;
+
+      try {
+        response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            students: studentsToExport,
+            visibility,
+          }),
+        });
+      } catch (networkErr) {
+        // If relative proxy failed, try direct port 5001
+        response = await fetch('http://localhost:5001/api/generate-pdf', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            students: studentsToExport,
+            visibility,
+          }),
+        });
+      }
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -134,18 +166,22 @@ export default function App() {
       link.remove();
       window.URL.revokeObjectURL(url);
 
-      setNotification({
-        severity: 'success',
-        message: `فایل PDF چندصفحه‌ای شامل ${studentsToExport.length} کارنامه با موفقیت دانلود شد.`,
-      });
+      setExportModalState((prev) => ({
+        ...prev,
+        status: 'success',
+      }));
     } catch (err) {
-      setNotification({
-        severity: 'error',
-        message: `خطا در ساخت PDF: ${err.message}. لطفاً بررسی نمایید که سرویس سرور (Port 5001) فعال باشد.`,
-      });
-    } finally {
-      setIsExporting(false);
+      console.error('PDF Export Error:', err);
+      setExportModalState((prev) => ({
+        ...prev,
+        status: 'error',
+        errorMessage: err.message || 'خطا در برقراری ارتباط با سرویس سرور Puppeteer رخ داد.',
+      }));
     }
+  };
+
+  const handleCloseExportModal = () => {
+    setExportModalState((prev) => ({ ...prev, open: false }));
   };
 
   return (
@@ -175,7 +211,7 @@ export default function App() {
               selectedStudentIds={selectedStudentIds}
               onToggleSelectAll={handleToggleSelectAll}
               onExportPdf={handleExportPdf}
-              isExporting={isExporting}
+              isExporting={exportModalState.open && exportModalState.status === 'loading'}
             />
 
             <ReportCardPreviewer
@@ -187,6 +223,15 @@ export default function App() {
           </>
         )}
       </Container>
+
+      {/* Export Loading & Feedback Modal */}
+      <ExportModal
+        open={exportModalState.open}
+        studentCount={exportModalState.count}
+        status={exportModalState.status}
+        errorMessage={exportModalState.errorMessage}
+        onClose={handleCloseExportModal}
+      />
 
       <Snackbar
         open={Boolean(notification)}
