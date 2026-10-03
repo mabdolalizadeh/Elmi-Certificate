@@ -1,14 +1,16 @@
 import React, { useState, useMemo } from 'react';
-import { Box, Container, Snackbar, Alert } from '@mui/material';
-import Header from './components/Header';
-import FileImportCard from './components/FileImportCard';
-import ControlBar from './components/ControlBar';
+import { Box, Snackbar, Alert } from '@mui/material';
+import Sidebar from './components/Sidebar';
+import FiltersDropdownToolbar from './components/FiltersDropdownToolbar';
 import ReportCardPreviewer from './components/ReportCardPreviewer';
 import ExportModal from './components/ExportModal';
-import { SAMPLE_STUDENTS, enrichStudentData } from './utils/excelService';
+import ActionSpeedDial from './components/ActionSpeedDial';
+import { SAMPLE_STUDENTS, enrichStudentData, parseExcelFile } from './utils/excelService';
 
 export default function App() {
-  // Initialize with sample students so UI is immediately rich and interactive
+  const [selectedGrade, setSelectedGrade] = useState('7th');
+
+  // Initialize with sample 7th grade students so UI is immediately rich and interactive
   const [students, setStudents] = useState(() =>
     SAMPLE_STUDENTS.map((item, idx) => enrichStudentData(item, idx))
   );
@@ -51,17 +53,14 @@ export default function App() {
   // Filter students based on search term, class, and trend
   const filteredStudents = useMemo(() => {
     return students.filter((s) => {
-      // Search filter
       if (searchTerm && !s.name.includes(searchTerm)) {
         return false;
       }
 
-      // Class filter
       if (selectedClass !== 'ALL' && s.className !== selectedClass) {
         return false;
       }
 
-      // Trend filter
       if (selectedTrend === 'MATH_IMPROVE' && s.mathTrend.status !== 'improvement') {
         return false;
       }
@@ -79,16 +78,44 @@ export default function App() {
     });
   }, [students, searchTerm, selectedClass, selectedTrend]);
 
-  const handleStudentsLoaded = (loadedStudents) => {
-    setStudents(loadedStudents);
-    setSelectedStudentIds(loadedStudents.map((s) => s.id));
-    setCurrentPreviewIndex(0);
+  // SpeedDial handlers
+  const handleFileSelect = async (file) => {
+    if (!file) return;
+
+    if (!file.name.match(/\.(xlsx|xls)$/i)) {
+      setNotification({
+        severity: 'error',
+        message: 'فرمت فایل نامعتبر است. لطفاً فایل با پسوند .xlsx یا .xls انتخاب فرمایید.',
+      });
+      return;
+    }
+
+    try {
+      const result = await parseExcelFile(file);
+      setStudents(result.students);
+      setSelectedStudentIds(result.students.map((s) => s.id));
+      setCurrentPreviewIndex(0);
+      setNotification({
+        severity: 'success',
+        message: `اطلاعات ${result.totalRows} دانش‌آموز از فایل "${file.name}" با موفقیت بارگذاری و تحلیل شد.`,
+      });
+    } catch (err) {
+      setNotification({
+        severity: 'error',
+        message: err.message || 'خطا در بارگذاری فایل اکسل رخ داد.',
+      });
+    }
   };
 
-  const handleReset = () => {
-    setStudents([]);
-    setSelectedStudentIds([]);
+  const handleLoadDemo = () => {
+    const mockStudents = SAMPLE_STUDENTS.map((item, idx) => enrichStudentData(item, idx));
+    setStudents(mockStudents);
+    setSelectedStudentIds(mockStudents.map((s) => s.id));
     setCurrentPreviewIndex(0);
+    setNotification({
+      severity: 'info',
+      message: `اطلاعات نمونه شامل ${mockStudents.length} دانش‌آموز پایه هفتم بارگذاری شد.`,
+    });
   };
 
   const handleToggleSelectAll = () => {
@@ -97,11 +124,9 @@ export default function App() {
       filteredStudents.every((s) => selectedStudentIds.includes(s.id));
 
     if (allFilteredSelected) {
-      // Deselect filtered
       const filteredIds = new Set(filteredStudents.map((s) => s.id));
       setSelectedStudentIds((prev) => prev.filter((id) => !filteredIds.has(id)));
     } else {
-      // Select all filtered
       const filteredIds = filteredStudents.map((s) => s.id);
       setSelectedStudentIds((prev) => Array.from(new Set([...prev, ...filteredIds])));
     }
@@ -126,7 +151,6 @@ export default function App() {
     });
 
     try {
-      // Try relative /api first (works via Vite proxy or reverse proxy), fallback to explicit 5001
       const apiUrl = window.location.port === '5173' ? '/api/generate-pdf' : 'http://localhost:5001/api/generate-pdf';
       let response;
 
@@ -140,7 +164,6 @@ export default function App() {
           }),
         });
       } catch (networkErr) {
-        // If relative proxy failed, try direct port 5001
         response = await fetch('http://localhost:5001/api/generate-pdf', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -160,7 +183,7 @@ export default function App() {
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `کارنامه_افقی_دانش‌آموزان_${new Date().toISOString().slice(0, 10)}.pdf`);
+      link.setAttribute('download', `کارنامه_افقی_پایه_هفتم_${new Date().toISOString().slice(0, 10)}.pdf`);
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -175,7 +198,7 @@ export default function App() {
       setExportModalState((prev) => ({
         ...prev,
         status: 'error',
-        errorMessage: err.message || 'خطا در برقراری ارتباط با سرویس سرور Puppeteer رخ داد.',
+        errorMessage: err.message || 'خطا در برقراری ارتباط با سرویس سرور رخ داد.',
       }));
     }
   };
@@ -185,44 +208,61 @@ export default function App() {
   };
 
   return (
-    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }}>
-      <Header />
-      <Container maxWidth="xl" sx={{ mt: 3, mb: 6, flex: 1 }}>
-        <FileImportCard
-          onStudentsLoaded={handleStudentsLoaded}
-          currentCount={students.length}
-          onReset={handleReset}
+    <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: { xs: 'column', md: 'row' }, bgcolor: '#F8FAFC' }}>
+      {/* Right Sidebar for switching between grades */}
+      <Sidebar
+        selectedGrade={selectedGrade}
+        onSelectGrade={setSelectedGrade}
+        studentCount={students.length}
+      />
+
+      {/* Main Content Area (Left side in RTL) */}
+      <Box
+        component="main"
+        sx={{
+          flex: 1,
+          p: { xs: 2, md: 3.5 },
+          display: 'flex',
+          flexDirection: 'column',
+          minWidth: 0,
+          boxSizing: 'border-box',
+        }}
+      >
+        {/* Filters Dropdown Toolbar */}
+        <FiltersDropdownToolbar
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          selectedClass={selectedClass}
+          onClassChange={setSelectedClass}
+          selectedTrend={selectedTrend}
+          onTrendChange={setSelectedTrend}
+          availableClasses={availableClasses}
+          visibility={visibility}
+          onVisibilityChange={handleVisibilityChange}
+          selectedStudentIds={selectedStudentIds}
+          filteredStudents={filteredStudents}
+          totalStudentsCount={students.length}
+          onToggleSelectAll={handleToggleSelectAll}
+          onExportPdf={handleExportPdf}
+          isExporting={exportModalState.open && exportModalState.status === 'loading'}
         />
 
-        {students.length > 0 && (
-          <>
-            <ControlBar
-              students={students}
-              filteredStudents={filteredStudents}
-              searchTerm={searchTerm}
-              onSearchChange={setSearchTerm}
-              selectedClass={selectedClass}
-              onClassChange={setSelectedClass}
-              selectedTrend={selectedTrend}
-              onTrendChange={setSelectedTrend}
-              availableClasses={availableClasses}
-              visibility={visibility}
-              onVisibilityChange={handleVisibilityChange}
-              selectedStudentIds={selectedStudentIds}
-              onToggleSelectAll={handleToggleSelectAll}
-              onExportPdf={handleExportPdf}
-              isExporting={exportModalState.open && exportModalState.status === 'loading'}
-            />
+        {/* Live Certificate Previewer */}
+        <Box sx={{ flex: 1 }}>
+          <ReportCardPreviewer
+            students={filteredStudents}
+            visibility={visibility}
+            currentIndex={currentPreviewIndex}
+            onIndexChange={setCurrentPreviewIndex}
+          />
+        </Box>
+      </Box>
 
-            <ReportCardPreviewer
-              students={filteredStudents}
-              visibility={visibility}
-              currentIndex={currentPreviewIndex}
-              onIndexChange={setCurrentPreviewIndex}
-            />
-          </>
-        )}
-      </Container>
+      {/* SpeedDial Floating Button for Upload and Download */}
+      <ActionSpeedDial
+        onFileSelect={handleFileSelect}
+        onLoadDemo={handleLoadDemo}
+      />
 
       {/* Export Loading & Feedback Modal */}
       <ExportModal
@@ -235,7 +275,7 @@ export default function App() {
 
       <Snackbar
         open={Boolean(notification)}
-        autoHideDuration={6000}
+        autoHideDuration={5000}
         onClose={() => setNotification(null)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >

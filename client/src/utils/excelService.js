@@ -26,7 +26,7 @@ export const normalizeKey = (key = '') => {
 export const SAMPLE_STUDENTS = [
   {
     [EXCEL_HEADERS.NAME]: 'علیرضا حسینی',
-    [EXCEL_HEADERS.CLASS]: 'دهم ریاضی ۱',
+    [EXCEL_HEADERS.CLASS]: 'هفتم ۱',
     [EXCEL_HEADERS.ABSENCES]: 1,
     [EXCEL_HEADERS.TARDIES]: 2,
     [EXCEL_HEADERS.DISCIPLINE]: 'عالی',
@@ -40,7 +40,7 @@ export const SAMPLE_STUDENTS = [
   },
   {
     [EXCEL_HEADERS.NAME]: 'محمد صادقی',
-    [EXCEL_HEADERS.CLASS]: 'دهم ریاضی ۱',
+    [EXCEL_HEADERS.CLASS]: 'هفتم ۱',
     [EXCEL_HEADERS.ABSENCES]: 4,
     [EXCEL_HEADERS.TARDIES]: 5,
     [EXCEL_HEADERS.DISCIPLINE]: 'نیاز به توجه',
@@ -54,7 +54,7 @@ export const SAMPLE_STUDENTS = [
   },
   {
     [EXCEL_HEADERS.NAME]: 'سارا رحیمی',
-    [EXCEL_HEADERS.CLASS]: 'دهم تجربی ۲',
+    [EXCEL_HEADERS.CLASS]: 'هفتم ۲',
     [EXCEL_HEADERS.ABSENCES]: 0,
     [EXCEL_HEADERS.TARDIES]: 1,
     [EXCEL_HEADERS.DISCIPLINE]: 'عالی',
@@ -68,7 +68,7 @@ export const SAMPLE_STUDENTS = [
   },
   {
     [EXCEL_HEADERS.NAME]: 'امیررضا کریمی',
-    [EXCEL_HEADERS.CLASS]: 'دهم ریاضی ۱',
+    [EXCEL_HEADERS.CLASS]: 'هفتم ۱',
     [EXCEL_HEADERS.ABSENCES]: 2,
     [EXCEL_HEADERS.TARDIES]: 3,
     [EXCEL_HEADERS.DISCIPLINE]: 'خوب',
@@ -82,7 +82,7 @@ export const SAMPLE_STUDENTS = [
   },
   {
     [EXCEL_HEADERS.NAME]: 'فاطمه نوری',
-    [EXCEL_HEADERS.CLASS]: 'دهم تجربی ۲',
+    [EXCEL_HEADERS.CLASS]: 'هفتم ۲',
     [EXCEL_HEADERS.ABSENCES]: 1,
     [EXCEL_HEADERS.TARDIES]: 0,
     [EXCEL_HEADERS.DISCIPLINE]: 'عالی',
@@ -96,7 +96,7 @@ export const SAMPLE_STUDENTS = [
   },
   {
     [EXCEL_HEADERS.NAME]: 'پارسا مرادی',
-    [EXCEL_HEADERS.CLASS]: 'یازدهم ریاضی ۱',
+    [EXCEL_HEADERS.CLASS]: 'هفتم ۳',
     [EXCEL_HEADERS.ABSENCES]: 6,
     [EXCEL_HEADERS.TARDIES]: 8,
     [EXCEL_HEADERS.DISCIPLINE]: 'ضعیف',
