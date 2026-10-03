@@ -29,6 +29,7 @@ import {
   ShieldCheck,
   Quote,
 } from 'lucide-react';
+import { toPersianDigits } from '../utils/excelService';
 
 export default function FiltersDropdownToolbar({
   searchTerm,
@@ -124,7 +125,7 @@ export default function FiltersDropdownToolbar({
           />
 
           {/* Filters Dropdown Trigger Button */}
-          <Badge badgeContent={activeFilterCount} color="primary" overlap="circular">
+          <Badge badgeContent={activeFilterCount > 0 ? toPersianDigits(activeFilterCount) : 0} color="primary" overlap="circular">
             <Button
               variant="outlined"
               onClick={handleOpenFilters}
@@ -209,7 +210,7 @@ export default function FiltersDropdownToolbar({
               },
             }}
           >
-            {isExporting ? 'در حال ایجاد PDF...' : `چاپ PDF (${selectedCount} کارنامه)`}
+            {isExporting ? 'در حال ایجاد PDF...' : `چاپ PDF (${toPersianDigits(selectedCount)} کارنامه)`}
           </Button>
         </Stack>
       </Stack>
@@ -230,12 +231,12 @@ export default function FiltersDropdownToolbar({
         PaperProps={{
           sx: {
             mt: 1.5,
-            p: 2.5,
-            width: 380,
-            maxWidth: '90vw',
-            borderRadius: 3.5,
+            p: { xs: 2.5, sm: 3.5 },
+            width: 440,
+            maxWidth: '92vw',
+            borderRadius: 4,
             border: '1px solid #CBD5E1',
-            boxShadow: '0 12px 32px rgba(15, 23, 42, 0.12)',
+            boxShadow: '0 16px 40px -4px rgba(15, 23, 42, 0.16)',
             direction: 'rtl',
           },
         }}

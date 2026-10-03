@@ -23,6 +23,13 @@ export const normalizeKey = (key = '') => {
     .trim();
 };
 
+// Convert English numbers to Persian digits
+export const toPersianDigits = (num) => {
+  if (num === null || num === undefined || num === '') return '';
+  const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+  return String(num).replace(/[0-9]/g, (w) => persianDigits[+w]);
+};
+
 export const SAMPLE_STUDENTS = [
   {
     [EXCEL_HEADERS.NAME]: 'علیرضا حسینی',

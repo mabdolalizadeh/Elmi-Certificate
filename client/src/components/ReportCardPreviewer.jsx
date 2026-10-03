@@ -20,6 +20,7 @@ import {
   Users,
 } from 'lucide-react';
 import ReportCard from './ReportCard';
+import { toPersianDigits } from '../utils/excelService';
 
 // Framer motion slide variants
 const variants = {
@@ -168,7 +169,7 @@ export default function ReportCardPreviewer({
               پیش‌نمایش زنده کارنامه افقی
             </Typography>
             <Typography variant="caption" sx={{ color: '#64748B' }}>
-              کارنامه {page + 1} از {students.length} دانش‌آموز (جهت جابه‌جایی از کلیدهای جهت‌نما استفاده کنید)
+              کارنامه {toPersianDigits(page + 1)} از {toPersianDigits(students.length)} دانش‌آموز (جهت جابه‌جایی از کلیدهای جهت‌نما استفاده کنید)
             </Typography>
           </Box>
         </Stack>
@@ -202,10 +203,10 @@ export default function ReportCardPreviewer({
           </Tooltip>
 
           <Chip
-            label={`${page + 1} / ${students.length}`}
+            label={`${toPersianDigits(page + 1)} از ${toPersianDigits(students.length)}`}
             color="primary"
             variant="outlined"
-            sx={{ fontWeight: 800, px: 1, minWidth: 70 }}
+            sx={{ fontWeight: 800, px: 1, minWidth: 80, fontSize: '0.85rem' }}
           />
 
           <Tooltip title="دانش‌آموز بعدی (کلید چپ کیبورد)">
@@ -236,16 +237,15 @@ export default function ReportCardPreviewer({
         </Stack>
       </Stack>
 
-      {/* Interactive Carousel Frame */}
+      {/* Interactive Carousel Frame - Full Width, Zero Horizontal Margin Waste */}
       <Box
         sx={{
           position: 'relative',
           width: '100%',
           overflow: 'hidden',
-          borderRadius: 3.5,
-          p: { xs: 1, sm: 2 },
-          bgcolor: 'rgba(241, 245, 249, 0.6)',
-          border: '1px solid #E2E8F0',
+          borderRadius: 4,
+          p: 0,
+          bgcolor: 'transparent',
         }}
       >
         <AnimatePresence initial={false} custom={direction} mode="wait">

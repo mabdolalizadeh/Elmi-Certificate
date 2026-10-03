@@ -2,6 +2,12 @@
  * Generates standalone, self-contained HTML for multi-page A4 Landscape PDF.
  * Each student card is wrapped in a container with strict page breaks.
  */
+const toPersianDigits = (num) => {
+  if (num === null || num === undefined || num === '') return '';
+  const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+  return String(num).replace(/[0-9]/g, (w) => persianDigits[+w]);
+};
+
 export function generatePdfHtml(students = [], visibility = {}) {
   const vis = {
     academic: visibility.academic !== false,
@@ -29,7 +35,7 @@ export function generatePdfHtml(students = [], visibility = {}) {
 
   const renderTrendBadge = (trend) => {
     if (!trend) return '';
-    const diffSign = trend.diff > 0 ? `+${trend.diff}%` : `${trend.diff}%`;
+    const diffSign = trend.diff > 0 ? `+${toPersianDigits(trend.diff)}٪` : `${toPersianDigits(trend.diff)}٪`;
     const arrowSymbol = trend.status === 'improvement' ? '▲' : trend.status === 'decline' ? '▼' : '▬';
 
     return `
@@ -57,8 +63,8 @@ export function generatePdfHtml(students = [], visibility = {}) {
             <div class="school-info">
               <div class="school-icon">🎓</div>
               <div>
-                <div class="school-name">مجتمع آموزشی و دبیرستان نمونه رشد</div>
-                <div class="school-sub">کارنامه عملکرد تحصیلی، انضباطی و تحلیل رشد مستمر</div>
+                <div class="school-name">مجتمع آموزشی و دبیرستان رشد</div>
+                <div class="school-sub">کارنامه رسمی عملکرد تحصیلی، انضباطی و تحلیل رشد مستمر</div>
               </div>
             </div>
 
@@ -92,7 +98,7 @@ export function generatePdfHtml(students = [], visibility = {}) {
                 <div class="bar-group">
                   <div class="bar-info">
                     <span>دوره فعلی</span>
-                    <span style="font-weight:800; color:#4F46E5;">%${student.currTotal}</span>
+                    <span style="font-weight:800; color:#4F46E5;">٪${toPersianDigits(student.currTotal)}</span>
                   </div>
                   <div class="progress-track">
                     <div class="progress-fill total-curr" style="width: ${Math.min(100, Math.max(0, student.currTotal))}%;"></div>
@@ -101,7 +107,7 @@ export function generatePdfHtml(students = [], visibility = {}) {
                 <div class="bar-group" style="margin-top:8px;">
                   <div class="bar-info">
                     <span>دوره قبلی</span>
-                    <span style="font-weight:700; color:#64748B;">%${student.prevTotal}</span>
+                    <span style="font-weight:700; color:#64748B;">٪${toPersianDigits(student.prevTotal)}</span>
                   </div>
                   <div class="progress-track">
                     <div class="progress-fill total-prev" style="width: ${Math.min(100, Math.max(0, student.prevTotal))}%;"></div>
@@ -118,7 +124,7 @@ export function generatePdfHtml(students = [], visibility = {}) {
                 <div class="bar-group">
                   <div class="bar-info">
                     <span>درصد فعلی ریاضی</span>
-                    <span style="font-weight:800; color:#0284C7;">%${student.currMath}</span>
+                    <span style="font-weight:800; color:#0284C7;">٪${toPersianDigits(student.currMath)}</span>
                   </div>
                   <div class="progress-track">
                     <div class="progress-fill math-curr" style="width: ${Math.min(100, Math.max(0, student.currMath))}%;"></div>
@@ -127,7 +133,7 @@ export function generatePdfHtml(students = [], visibility = {}) {
                 <div class="bar-group" style="margin-top:8px;">
                   <div class="bar-info">
                     <span>درصد قبلی ریاضی</span>
-                    <span style="font-weight:700; color:#64748B;">%${student.prevMath}</span>
+                    <span style="font-weight:700; color:#64748B;">٪${toPersianDigits(student.prevMath)}</span>
                   </div>
                   <div class="progress-track">
                     <div class="progress-fill math-prev" style="width: ${Math.min(100, Math.max(0, student.prevMath))}%;"></div>
@@ -152,11 +158,11 @@ export function generatePdfHtml(students = [], visibility = {}) {
               <div class="attendance-grid">
                 <div class="att-card">
                   <div class="att-title">غیبت‌ها</div>
-                  <div class="att-value">${student.absences} <span class="att-unit">روز</span></div>
+                  <div class="att-value">${toPersianDigits(student.absences)} <span class="att-unit">روز</span></div>
                 </div>
                 <div class="att-card">
                   <div class="att-title">تاخیرها</div>
-                  <div class="att-value">${student.tardies} <span class="att-unit">مورد</span></div>
+                  <div class="att-value">${toPersianDigits(student.tardies)} <span class="att-unit">مورد</span></div>
                 </div>
               </div>
               `
@@ -182,7 +188,7 @@ export function generatePdfHtml(students = [], visibility = {}) {
               <div class="metric-box" style="margin-top:10px;">
                 <div class="metric-head">
                   <span class="metric-label">نرخ تحویل تکالیف</span>
-                  <span style="font-weight:800; color:#4F46E5; font-size:13px;">${student.homeworkSubmitted} از ${student.homeworkTotal} (%${student.homeworkRate})</span>
+                  <span style="font-weight:800; color:#4F46E5; font-size:13px;">${toPersianDigits(student.homeworkSubmitted)} از ${toPersianDigits(student.homeworkTotal)} (٪${toPersianDigits(student.homeworkRate)})</span>
                 </div>
                 <div class="progress-track" style="margin-top:8px; height:10px;">
                   <div class="progress-fill" style="width:${student.homeworkRate}%; background:${
@@ -230,7 +236,7 @@ export function generatePdfHtml(students = [], visibility = {}) {
 
           <!-- FOOTER -->
           <div class="card-footer">
-            <div>کد یکتای پرونده: ELMI-${(student.id || 'STD01').toUpperCase()} • ثبت شده در سامانه یکپارچه رشد</div>
+            <div>کد یکتای پرونده: ELMI-${toPersianDigits((student.id || 'STD01').replace('student-', ''))} • ثبت شده در سامانه یکپارچه رشد</div>
             <div>تاریخ صدور: مهرماه ۱۴۰۵ • صفحه ۱ از ۱</div>
           </div>
         </div>

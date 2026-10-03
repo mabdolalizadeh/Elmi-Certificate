@@ -18,8 +18,11 @@ import {
   BookOpen,
   Quote,
   Stamp,
+  Sparkles,
+  QrCode,
+  FileCheck,
 } from 'lucide-react';
-import { getDisciplineStyle } from '../utils/excelService';
+import { getDisciplineStyle, toPersianDigits } from '../utils/excelService';
 
 export default function ReportCard({
   student,
@@ -36,13 +39,14 @@ export default function ReportCard({
 
   const disciplineStyle = getDisciplineStyle(student.discipline);
 
-  // Helper to render trend badge
+  // Helper to render trend badge with Persian numbers
   const renderTrendBadge = (trend) => {
     let Icon = Minus;
     if (trend.status === 'improvement') Icon = TrendingUp;
     if (trend.status === 'decline') Icon = TrendingDown;
 
-    const diffSign = trend.diff > 0 ? `+${trend.diff}%` : `${trend.diff}%`;
+    const diffAbs = Math.abs(trend.diff);
+    const diffSign = trend.diff > 0 ? `+${toPersianDigits(diffAbs)}٪` : trend.diff < 0 ? `-${toPersianDigits(diffAbs)}٪` : `${toPersianDigits(0)}٪`;
 
     return (
       <Box
@@ -52,17 +56,17 @@ export default function ReportCard({
           gap: 0.6,
           px: 1.2,
           py: 0.4,
-          borderRadius: 1.5,
+          borderRadius: 2,
           bgcolor: trend.bgColor,
           color: trend.color,
-          border: `1px solid ${trend.color}33`,
-          fontWeight: 700,
+          border: `1px solid ${trend.color}40`,
+          fontWeight: 800,
           fontSize: '0.8rem',
         }}
       >
         <Icon size={14} />
         <span>{trend.label}</span>
-        <span style={{ direction: 'ltr', fontSize: '0.75rem', opacity: 0.9 }}>
+        <span style={{ fontSize: '0.78rem', fontWeight: 800 }}>
           ({diffSign})
         </span>
       </Box>
@@ -74,14 +78,12 @@ export default function ReportCard({
       className="report-card-container"
       sx={{
         width: '100%',
-        maxWidth: 1080,
-        margin: '0 auto',
-        aspectRatio: isPdf ? 'unset' : '1.414 / 1', // A4 Landscape ratio
+        margin: 0,
         bgcolor: '#FFFFFF',
-        borderRadius: isPdf ? 0 : 3.5,
-        border: isPdf ? 'none' : '1px solid #CBD5E1',
-        boxShadow: isPdf ? 'none' : '0 10px 30px -5px rgba(15, 23, 42, 0.08)',
-        p: { xs: 2.5, md: 3 },
+        borderRadius: isPdf ? 0 : 4,
+        border: isPdf ? 'none' : '1.5px solid #CBD5E1',
+        boxShadow: isPdf ? 'none' : '0 12px 36px -4px rgba(15, 23, 42, 0.08)',
+        p: { xs: 2.5, md: 3.5 },
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
@@ -90,80 +92,119 @@ export default function ReportCard({
         overflow: 'hidden',
         pageBreakAfter: 'always',
         breakAfter: 'page',
+        fontFeatureSettings: '"ss01" 1',
       }}
     >
-      {/* Decorative top border strip */}
+      {/* Decorative Ornate Golden-Indigo Top Border */}
       <Box
         sx={{
           position: 'absolute',
           top: 0,
           left: 0,
           right: 0,
-          height: 6,
-          background: 'linear-gradient(90deg, #4F46E5 0%, #0EA5E9 50%, #10B981 100%)',
+          height: 7,
+          background: 'linear-gradient(90deg, #312E81 0%, #4F46E5 25%, #F59E0B 50%, #10B981 75%, #059669 100%)',
         }}
       />
 
-      {/* ================= HEADER SECTION ================= */}
+      {/* Decorative Watermark Emblem in Background */}
+      <Box
+        sx={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          opacity: 0.025,
+          pointerEvents: 'none',
+          userSelect: 'none',
+        }}
+      >
+        <Award size={480} color="#000000" />
+      </Box>
+
+      {/* ================= REDESIGNED HEADER ================= */}
       <Box
         sx={{
           borderBottom: '2px solid #E2E8F0',
-          pb: 2,
-          mb: 2,
+          pb: 2.2,
+          mb: 2.5,
+          position: 'relative',
         }}
       >
         <Stack direction="row" alignItems="center" justifyContent="space-between">
           {/* Right side: School Crest & School Name */}
-          <Stack direction="row" spacing={1.5} alignItems="center">
+          <Stack direction="row" spacing={2} alignItems="center">
             <Box
               sx={{
-                width: 48,
-                height: 48,
-                borderRadius: '12px',
-                bgcolor: '#EEF2FF',
-                color: '#4F46E5',
+                width: 54,
+                height: 54,
+                borderRadius: '16px',
+                background: 'linear-gradient(135deg, #1E1B4B 0%, #3730A3 100%)',
+                color: '#FBBF24',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                border: '1.5px solid #C7D2FE',
+                boxShadow: '0 6px 16px rgba(49, 46, 129, 0.25)',
+                border: '2px solid #E0E7FF',
               }}
             >
-              <Award size={28} />
+              <Award size={32} />
             </Box>
             <Box>
-              <Typography variant="h6" sx={{ fontWeight: 800, color: '#1E1B4B', fontSize: '1.15rem' }}>
-                مجتمع آموزشی و دبیرستان نمونه رشد
-              </Typography>
-              <Typography variant="body2" sx={{ color: '#64748B', fontSize: '0.82rem' }}>
-                کارنامه عملکرد تحصیلی، انضباطی و تحلیل رشد مستمر
-              </Typography>
-            </Box>
-          </Stack>
-
-          {/* Student Profile Overview */}
-          <Stack direction="row" spacing={2} alignItems="center">
-            <Box sx={{ textAlign: 'left', pl: 1 }}>
-              <Typography variant="caption" sx={{ color: '#94A3B8', display: 'block', fontSize: '0.72rem' }}>
-                سال تحصیلی ۱۴۰۵-۱۴۰۴ • نوبت دوم
-              </Typography>
-              <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 0.3 }}>
-                <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#0F172A', fontSize: '1.1rem' }}>
-                  {student.name}
+              <Stack direction="row" spacing={1} alignItems="center">
+                <Typography variant="h5" sx={{ fontWeight: 900, color: '#1E1B4B', fontSize: '1.25rem', letterSpacing: '-0.3px' }}>
+                  مجتمع آموزشی و دبیرستان نمونه رشد
                 </Typography>
                 <Chip
-                  label={student.className}
+                  label="پایه هفتم"
                   size="small"
                   sx={{
                     bgcolor: '#EEF2FF',
                     color: '#4338CA',
-                    fontWeight: 700,
-                    fontSize: '0.78rem',
-                    height: 24,
+                    fontWeight: 800,
+                    fontSize: '0.75rem',
+                    height: 22,
+                    border: '1px solid #C7D2FE',
                   }}
                 />
               </Stack>
+              <Typography variant="body2" sx={{ color: '#64748B', fontSize: '0.84rem', mt: 0.3 }}>
+                کارنامه رسمی عملکرد تحصیلی، رفتار کلاسی و تحلیل رشد مستمر دانش‌آموز
+              </Typography>
             </Box>
           </Stack>
+
+          {/* Left side: Student Name & Academic Metadata */}
+          <Box
+            sx={{
+              textAlign: 'left',
+              bgcolor: '#F8FAFC',
+              px: 2.5,
+              py: 1.2,
+              borderRadius: 3,
+              border: '1px solid #E2E8F0',
+            }}
+          >
+            <Typography variant="caption" sx={{ color: '#94A3B8', display: 'block', fontSize: '0.75rem', fontWeight: 600 }}>
+              سال تحصیلی ۱۴۰۵-۱۴۰۴ • نوبت دوم
+            </Typography>
+            <Stack direction="row" spacing={1.2} alignItems="center" sx={{ mt: 0.4 }}>
+              <Typography variant="h6" sx={{ fontWeight: 900, color: '#0F172A', fontSize: '1.15rem' }}>
+                {student.name}
+              </Typography>
+              <Chip
+                label={`کلاس ${student.className}`}
+                size="small"
+                sx={{
+                  bgcolor: '#4F46E5',
+                  color: '#FFFFFF',
+                  fontWeight: 800,
+                  fontSize: '0.78rem',
+                  height: 24,
+                }}
+              />
+            </Stack>
+          </Box>
         </Stack>
       </Box>
 
@@ -171,7 +212,7 @@ export default function ReportCard({
       <Box
         sx={{
           display: 'grid',
-          gridTemplateColumns: { xs: '1fr', md: '1.2fr 1fr 1.1fr' },
+          gridTemplateColumns: { xs: '1fr', md: '1.15fr 1fr 1.05fr' },
           gap: 2.2,
           flex: 1,
         }}
@@ -181,17 +222,19 @@ export default function ReportCard({
           <Box
             sx={{
               bgcolor: '#F8FAFC',
-              borderRadius: 3,
-              p: 2,
+              borderRadius: 3.5,
+              p: 2.2,
               border: '1px solid #E2E8F0',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
             }}
           >
-            <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1.5 }}>
-              <BookOpen size={18} color="#4F46E5" />
-              <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#1E293B', fontSize: '0.9rem' }}>
+            <Stack direction="row" alignItems="center" spacing={1.2} sx={{ mb: 1.8 }}>
+              <Box sx={{ p: 0.8, borderRadius: 2, bgcolor: '#EEF2FF', color: '#4F46E5' }}>
+                <BookOpen size={18} />
+              </Box>
+              <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#1E293B', fontSize: '0.92rem' }}>
                 تحلیل وضعیت آموزشی و روند نمرات
               </Typography>
             </Stack>
@@ -200,14 +243,15 @@ export default function ReportCard({
             <Box
               sx={{
                 bgcolor: '#FFFFFF',
-                borderRadius: 2.5,
-                p: 1.8,
+                borderRadius: 3,
+                p: 2,
                 border: '1px solid #E2E8F0',
-                mb: 1.5,
+                boxShadow: '0 2px 8px rgba(15, 23, 42, 0.02)',
+                mb: 1.8,
               }}
             >
-              <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.2 }}>
-                <Typography variant="body2" sx={{ fontWeight: 700, color: '#334155', fontSize: '0.85rem' }}>
+              <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.4 }}>
+                <Typography variant="body2" sx={{ fontWeight: 800, color: '#334155', fontSize: '0.86rem' }}>
                   میانگین درصد کل دروس
                 </Typography>
                 {renderTrendBadge(student.overallTrend)}
@@ -215,43 +259,43 @@ export default function ReportCard({
 
               {/* Comparative Visual Bars */}
               <Box sx={{ mb: 1.5 }}>
-                <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.4 }}>
-                  <Typography variant="caption" sx={{ color: '#64748B', fontSize: '0.75rem' }}>
+                <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.5 }}>
+                  <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 600 }}>
                     دوره فعلی
                   </Typography>
-                  <Typography variant="caption" sx={{ fontWeight: 800, color: '#4F46E5' }}>
-                    %{student.currTotal}
+                  <Typography variant="caption" sx={{ fontWeight: 900, color: '#4F46E5', fontSize: '0.9rem' }}>
+                    ٪{toPersianDigits(student.currTotal)}
                   </Typography>
                 </Stack>
                 <LinearProgress
                   variant="determinate"
                   value={Math.min(100, Math.max(0, student.currTotal))}
                   sx={{
-                    height: 8,
-                    borderRadius: 4,
+                    height: 9,
+                    borderRadius: 4.5,
                     bgcolor: '#E0E7FF',
                     '& .MuiLinearProgress-bar': {
                       background: 'linear-gradient(90deg, #6366F1, #4F46E5)',
-                      borderRadius: 4,
+                      borderRadius: 4.5,
                     },
                   }}
                 />
               </Box>
 
               <Box>
-                <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.4 }}>
-                  <Typography variant="caption" sx={{ color: '#64748B', fontSize: '0.75rem' }}>
+                <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.5 }}>
+                  <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 600 }}>
                     دوره قبلی
                   </Typography>
-                  <Typography variant="caption" sx={{ fontWeight: 700, color: '#64748B' }}>
-                    %{student.prevTotal}
+                  <Typography variant="caption" sx={{ fontWeight: 800, color: '#64748B', fontSize: '0.85rem' }}>
+                    ٪{toPersianDigits(student.prevTotal)}
                   </Typography>
                 </Stack>
                 <LinearProgress
                   variant="determinate"
                   value={Math.min(100, Math.max(0, student.prevTotal))}
                   sx={{
-                    height: 6,
+                    height: 7,
                     borderRadius: 4,
                     bgcolor: '#F1F5F9',
                     '& .MuiLinearProgress-bar': {
@@ -267,13 +311,14 @@ export default function ReportCard({
             <Box
               sx={{
                 bgcolor: '#FFFFFF',
-                borderRadius: 2.5,
-                p: 1.8,
+                borderRadius: 3,
+                p: 2,
                 border: '1px solid #E2E8F0',
+                boxShadow: '0 2px 8px rgba(15, 23, 42, 0.02)',
               }}
             >
-              <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.2 }}>
-                <Typography variant="body2" sx={{ fontWeight: 700, color: '#334155', fontSize: '0.85rem' }}>
+              <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.4 }}>
+                <Typography variant="body2" sx={{ fontWeight: 800, color: '#334155', fontSize: '0.86rem' }}>
                   عملکرد تخصصی درس ریاضی
                 </Typography>
                 {renderTrendBadge(student.mathTrend)}
@@ -281,43 +326,43 @@ export default function ReportCard({
 
               {/* Comparative Visual Bars */}
               <Box sx={{ mb: 1.5 }}>
-                <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.4 }}>
-                  <Typography variant="caption" sx={{ color: '#64748B', fontSize: '0.75rem' }}>
+                <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.5 }}>
+                  <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 600 }}>
                     درصد فعلی ریاضی
                   </Typography>
-                  <Typography variant="caption" sx={{ fontWeight: 800, color: '#0EA5E9' }}>
-                    %{student.currMath}
+                  <Typography variant="caption" sx={{ fontWeight: 900, color: '#0284C7', fontSize: '0.9rem' }}>
+                    ٪{toPersianDigits(student.currMath)}
                   </Typography>
                 </Stack>
                 <LinearProgress
                   variant="determinate"
                   value={Math.min(100, Math.max(0, student.currMath))}
                   sx={{
-                    height: 8,
-                    borderRadius: 4,
+                    height: 9,
+                    borderRadius: 4.5,
                     bgcolor: '#E0F2FE',
                     '& .MuiLinearProgress-bar': {
                       background: 'linear-gradient(90deg, #38BDF8, #0284C7)',
-                      borderRadius: 4,
+                      borderRadius: 4.5,
                     },
                   }}
                 />
               </Box>
 
               <Box>
-                <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.4 }}>
-                  <Typography variant="caption" sx={{ color: '#64748B', fontSize: '0.75rem' }}>
+                <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.5 }}>
+                  <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 600 }}>
                     درصد قبلی ریاضی
                   </Typography>
-                  <Typography variant="caption" sx={{ fontWeight: 700, color: '#64748B' }}>
-                    %{student.prevMath}
+                  <Typography variant="caption" sx={{ fontWeight: 800, color: '#64748B', fontSize: '0.85rem' }}>
+                    ٪{toPersianDigits(student.prevMath)}
                   </Typography>
                 </Stack>
                 <LinearProgress
                   variant="determinate"
                   value={Math.min(100, Math.max(0, student.prevMath))}
                   sx={{
-                    height: 6,
+                    height: 7,
                     borderRadius: 4,
                     bgcolor: '#F1F5F9',
                     '& .MuiLinearProgress-bar': {
@@ -335,42 +380,45 @@ export default function ReportCard({
         <Box
           sx={{
             bgcolor: '#F8FAFC',
-            borderRadius: 3,
-            p: 2,
+            borderRadius: 3.5,
+            p: 2.2,
             border: '1px solid #E2E8F0',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
           }}
         >
-          <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1.5 }}>
-            <ShieldCheck size={18} color="#059669" />
-            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#1E293B', fontSize: '0.9rem' }}>
+          <Stack direction="row" alignItems="center" spacing={1.2} sx={{ mb: 1.8 }}>
+            <Box sx={{ p: 0.8, borderRadius: 2, bgcolor: '#ECFDF5', color: '#059669' }}>
+              <ShieldCheck size={18} />
+            </Box>
+            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#1E293B', fontSize: '0.92rem' }}>
               انضباط، تکالیف و حضور و غیاب
             </Typography>
           </Stack>
 
           {/* Attendance Cards */}
           {visibility.attendance && (
-            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1.2, mb: 1.5 }}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1.5, mb: 1.8 }}>
               <Box
                 sx={{
                   bgcolor: '#FFFFFF',
-                  borderRadius: 2.5,
-                  p: 1.4,
+                  borderRadius: 3,
+                  p: 1.6,
                   textAlign: 'center',
                   border: '1px solid #E2E8F0',
+                  boxShadow: '0 2px 8px rgba(15, 23, 42, 0.02)',
                 }}
               >
-                <Stack direction="row" justifyContent="center" alignItems="center" spacing={0.6} sx={{ mb: 0.5 }}>
+                <Stack direction="row" justifyContent="center" alignItems="center" spacing={0.6} sx={{ mb: 0.6 }}>
                   <CalendarX2 size={16} color="#DC2626" />
-                  <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 600 }}>
+                  <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 700 }}>
                     غیبت‌ها
                   </Typography>
                 </Stack>
-                <Typography variant="h5" sx={{ fontWeight: 800, color: '#1E293B', fontSize: '1.25rem' }}>
-                  {student.absences}
-                  <Typography component="span" variant="caption" sx={{ color: '#94A3B8', mr: 0.5 }}>
+                <Typography variant="h5" sx={{ fontWeight: 900, color: '#1E293B', fontSize: '1.4rem' }}>
+                  {toPersianDigits(student.absences)}
+                  <Typography component="span" variant="caption" sx={{ color: '#94A3B8', mr: 0.6, fontSize: '0.8rem' }}>
                     روز
                   </Typography>
                 </Typography>
@@ -379,21 +427,22 @@ export default function ReportCard({
               <Box
                 sx={{
                   bgcolor: '#FFFFFF',
-                  borderRadius: 2.5,
-                  p: 1.4,
+                  borderRadius: 3,
+                  p: 1.6,
                   textAlign: 'center',
                   border: '1px solid #E2E8F0',
+                  boxShadow: '0 2px 8px rgba(15, 23, 42, 0.02)',
                 }}
               >
-                <Stack direction="row" justifyContent="center" alignItems="center" spacing={0.6} sx={{ mb: 0.5 }}>
+                <Stack direction="row" justifyContent="center" alignItems="center" spacing={0.6} sx={{ mb: 0.6 }}>
                   <Clock size={16} color="#D97706" />
-                  <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 600 }}>
+                  <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 700 }}>
                     تاخیرها
                   </Typography>
                 </Stack>
-                <Typography variant="h5" sx={{ fontWeight: 800, color: '#1E293B', fontSize: '1.25rem' }}>
-                  {student.tardies}
-                  <Typography component="span" variant="caption" sx={{ color: '#94A3B8', mr: 0.5 }}>
+                <Typography variant="h5" sx={{ fontWeight: 900, color: '#1E293B', fontSize: '1.4rem' }}>
+                  {toPersianDigits(student.tardies)}
+                  <Typography component="span" variant="caption" sx={{ color: '#94A3B8', mr: 0.6, fontSize: '0.8rem' }}>
                     مورد
                   </Typography>
                 </Typography>
@@ -406,26 +455,27 @@ export default function ReportCard({
             <Box
               sx={{
                 bgcolor: '#FFFFFF',
-                borderRadius: 2.5,
-                p: 1.5,
+                borderRadius: 3,
+                p: 1.8,
                 border: '1px solid #E2E8F0',
-                mb: 1.5,
+                boxShadow: '0 2px 8px rgba(15, 23, 42, 0.02)',
+                mb: 1.8,
               }}
             >
-              <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.8, fontWeight: 600 }}>
+              <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.8, fontWeight: 700 }}>
                 ارزیابی انضباط و رفتار کلاسی
               </Typography>
               <Box
                 sx={{
                   bgcolor: disciplineStyle.bg,
                   color: disciplineStyle.color,
-                  border: `1px solid ${disciplineStyle.border}`,
-                  py: 0.8,
+                  border: `1.5px solid ${disciplineStyle.border}`,
+                  py: 1,
                   px: 1.5,
-                  borderRadius: 2,
+                  borderRadius: 2.5,
                   textAlign: 'center',
-                  fontWeight: 800,
-                  fontSize: '0.92rem',
+                  fontWeight: 900,
+                  fontSize: '0.96rem',
                 }}
               >
                 وضعیت: {disciplineStyle.label}
@@ -438,28 +488,29 @@ export default function ReportCard({
             <Box
               sx={{
                 bgcolor: '#FFFFFF',
-                borderRadius: 2.5,
-                p: 1.5,
+                borderRadius: 3,
+                p: 1.8,
                 border: '1px solid #E2E8F0',
+                boxShadow: '0 2px 8px rgba(15, 23, 42, 0.02)',
               }}
             >
-              <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0.8 }}>
-                <Stack direction="row" spacing={0.6} alignItems="center">
-                  <CheckSquare size={15} color="#4F46E5" />
-                  <Typography variant="caption" sx={{ fontWeight: 700, color: '#334155' }}>
+              <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
+                <Stack direction="row" spacing={0.8} alignItems="center">
+                  <CheckSquare size={16} color="#4F46E5" />
+                  <Typography variant="caption" sx={{ fontWeight: 800, color: '#334155' }}>
                     نرخ تحویل تکالیف
                   </Typography>
                 </Stack>
-                <Typography variant="caption" sx={{ fontWeight: 800, color: '#4F46E5' }}>
-                  {student.homeworkSubmitted} از {student.homeworkTotal} (%{student.homeworkRate})
+                <Typography variant="caption" sx={{ fontWeight: 900, color: '#4F46E5', fontSize: '0.88rem' }}>
+                  {toPersianDigits(student.homeworkSubmitted)} از {toPersianDigits(student.homeworkTotal)} (٪{toPersianDigits(student.homeworkRate)})
                 </Typography>
               </Stack>
               <LinearProgress
                 variant="determinate"
                 value={student.homeworkRate}
                 sx={{
-                  height: 9,
-                  borderRadius: 4.5,
+                  height: 10,
+                  borderRadius: 5,
                   bgcolor: '#EEF2FF',
                   '& .MuiLinearProgress-bar': {
                     background:
@@ -468,7 +519,7 @@ export default function ReportCard({
                         : student.homeworkRate >= 60
                         ? 'linear-gradient(90deg, #F59E0B, #D97706)'
                         : 'linear-gradient(90deg, #F43F5E, #E11D48)',
-                    borderRadius: 4.5,
+                    borderRadius: 5,
                   },
                 }}
               />
@@ -481,17 +532,19 @@ export default function ReportCard({
           <Box
             sx={{
               bgcolor: '#F8FAFC',
-              borderRadius: 3,
-              p: 2,
+              borderRadius: 3.5,
+              p: 2.2,
               border: '1px solid #E2E8F0',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
             }}
           >
-            <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1.2 }}>
-              <Quote size={18} color="#D97706" />
-              <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#1E293B', fontSize: '0.9rem' }}>
+            <Stack direction="row" alignItems="center" spacing={1.2} sx={{ mb: 1.5 }}>
+              <Box sx={{ p: 0.8, borderRadius: 2, bgcolor: '#FEF3C7', color: '#D97706' }}>
+                <Quote size={18} />
+              </Box>
+              <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#1E293B', fontSize: '0.92rem' }}>
                 نظر و راهکار مشاوره تحصیلی
               </Typography>
             </Stack>
@@ -500,22 +553,23 @@ export default function ReportCard({
             <Box
               sx={{
                 bgcolor: '#FFFFFF',
-                borderRadius: 2.5,
-                p: 1.8,
+                borderRadius: 3,
+                p: 2,
                 border: '1px solid #E2E8F0',
-                borderRight: '4px solid #F59E0B',
+                borderRight: '5px solid #F59E0B',
+                boxShadow: '0 2px 8px rgba(15, 23, 42, 0.02)',
                 flex: 1,
                 display: 'flex',
                 alignItems: 'center',
-                mb: 1.5,
+                mb: 1.8,
               }}
             >
               <Typography
                 variant="body2"
                 sx={{
                   color: '#334155',
-                  lineHeight: 1.7,
-                  fontSize: '0.82rem',
+                  lineHeight: 1.8,
+                  fontSize: '0.84rem',
                   fontStyle: 'italic',
                 }}
               >
@@ -527,52 +581,58 @@ export default function ReportCard({
             <Box
               sx={{
                 bgcolor: '#FFFFFF',
-                borderRadius: 2.5,
-                p: 1.5,
-                border: '1px dashed #CBD5E1',
+                borderRadius: 3,
+                p: 1.6,
+                border: '1.5px dashed #CBD5E1',
                 textAlign: 'center',
               }}
             >
               <Stack direction="row" justifyContent="space-around" alignItems="center">
                 <Box>
-                  <Typography variant="caption" sx={{ color: '#94A3B8', display: 'block', mb: 0.5 }}>
+                  <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.6, fontWeight: 700 }}>
                     مهر و امضای مشاور
                   </Typography>
                   <Box
                     sx={{
-                      width: 60,
-                      height: 32,
-                      border: '1px dashed #E2E8F0',
-                      borderRadius: 1.5,
+                      width: 74,
+                      height: 38,
+                      border: '1px dashed #C7D2FE',
+                      borderRadius: 2,
+                      bgcolor: '#F8FAFC',
                       mx: 'auto',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      color: '#CBD5E1',
+                      color: '#4F46E5',
+                      fontSize: '0.72rem',
+                      fontWeight: 700,
                     }}
                   >
-                    <Stamp size={18} />
+                    مهر رسمی
                   </Box>
                 </Box>
 
                 <Box>
-                  <Typography variant="caption" sx={{ color: '#94A3B8', display: 'block', mb: 0.5 }}>
+                  <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.6, fontWeight: 700 }}>
                     امضای معاونت آموزشی
                   </Typography>
                   <Box
                     sx={{
-                      width: 60,
-                      height: 32,
-                      border: '1px dashed #E2E8F0',
-                      borderRadius: 1.5,
+                      width: 74,
+                      height: 38,
+                      border: '1px dashed #A7F3D0',
+                      borderRadius: 2,
+                      bgcolor: '#F8FAFC',
                       mx: 'auto',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      color: '#CBD5E1',
+                      color: '#059669',
+                      fontSize: '0.72rem',
+                      fontWeight: 700,
                     }}
                   >
-                    <Award size={18} />
+                    تایید نهایی
                   </Box>
                 </Box>
               </Stack>
@@ -584,16 +644,16 @@ export default function ReportCard({
       {/* ================= FOOTER TIMESTAMP & VERIFICATION ================= */}
       <Box
         sx={{
-          borderTop: '1px solid #F1F5F9',
-          pt: 1.2,
-          mt: 1.5,
+          borderTop: '1px solid #E2E8F0',
+          pt: 1.5,
+          mt: 2,
         }}
       >
         <Stack direction="row" justifyContent="space-between" alignItems="center">
-          <Typography variant="caption" sx={{ color: '#94A3B8', fontSize: '0.72rem' }}>
-            کد یکتای پرونده: ELMI-{student.id?.toUpperCase() || 'STD01'} • ثبت شده در سامانه یکپارچه رشد
+          <Typography variant="caption" sx={{ color: '#94A3B8', fontSize: '0.75rem', fontWeight: 600 }}>
+            کد یکتای پرونده: ELMI-{toPersianDigits(student.id?.replace('student-', ''))} • ثبت شده در سامانه یکپارچه رشد
           </Typography>
-          <Typography variant="caption" sx={{ color: '#94A3B8', fontSize: '0.72rem' }}>
+          <Typography variant="caption" sx={{ color: '#94A3B8', fontSize: '0.75rem', fontWeight: 600 }}>
             تاریخ صدور: مهرماه ۱۴۰۵ • صفحه ۱ از ۱
           </Typography>
         </Stack>
