@@ -805,49 +805,81 @@ export default function ReportCard({
           })()}
         </Box>
 
-        {/* ================= LEFT COLUMN: ADVISOR & SIGNATURE ================= */}
+        {/* ================= LEFT COLUMN: COMPACT ADVISOR NOTE & EXPANDED SIGNATURE ================= */}
         {visibility.advisor && (
           <Box
             sx={{
               bgcolor: '#F8FAFC',
               borderRadius: 3.5,
-              p: 2.2,
+              p: 2.4,
               border: '1px solid #E2E8F0',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
+              gap: 2,
             }}
           >
-            <Stack direction="row" alignItems="center" spacing={1.2} sx={{ mb: 1.5 }}>
-              <Box sx={{ p: 0.8, borderRadius: 2, bgcolor: '#FEF3C7', color: '#D97706' }}>
-                <Quote size={18} />
+            {/* Header */}
+            <Stack direction="row" alignItems="center" spacing={1.2}>
+              <Box
+                sx={{
+                  p: 0.9,
+                  borderRadius: 2.2,
+                  bgcolor: '#FEF3C7',
+                  color: '#D97706',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Quote size={20} />
               </Box>
-              <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#1E293B', fontSize: '0.92rem' }}>
-                نظر و راهکار مشاوره تحصیلی
-              </Typography>
+              <Box>
+                <Typography variant="subtitle2" sx={{ fontWeight: 900, color: '#1E293B', fontSize: '0.98rem' }}>
+                  توصیه مشاور و تایید نهایی
+                </Typography>
+                <Typography variant="caption" sx={{ color: '#64748B', fontSize: '0.74rem' }}>
+                  بازخورد کیفی و امضای مسئولین آموزشی
+                </Typography>
+              </Box>
             </Stack>
 
-            {/* Advisor Note Quote Card */}
+            {/* Compact Advisor Note (Top Section) */}
             <Box
               sx={{
                 bgcolor: '#FFFFFF',
                 borderRadius: 3,
-                p: 2,
-                border: '1px solid #E2E8F0',
+                p: 1.8,
+                border: '1.5px solid #FDE68A',
                 borderRight: '5px solid #F59E0B',
-                boxShadow: '0 2px 8px rgba(15, 23, 42, 0.02)',
-                flex: 1,
+                boxShadow: '0 4px 12px rgba(245, 158, 11, 0.05)',
                 display: 'flex',
-                alignItems: 'center',
-                mb: 1.8,
+                flexDirection: 'column',
+                gap: 0.8,
               }}
             >
+              <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Typography variant="caption" sx={{ fontWeight: 800, color: '#B45309', fontSize: '0.76rem' }}>
+                  نظر کارشناسی مشاور تحصیلی:
+                </Typography>
+                <Chip
+                  label="راهبرد دوره بعدی"
+                  size="small"
+                  sx={{
+                    bgcolor: '#FEF3C7',
+                    color: '#92400E',
+                    fontWeight: 700,
+                    fontSize: '0.68rem',
+                    height: 20,
+                  }}
+                />
+              </Stack>
               <Typography
                 variant="body2"
                 sx={{
                   color: '#334155',
-                  lineHeight: 1.8,
-                  fontSize: '0.84rem',
+                  lineHeight: 1.65,
+                  fontSize: '0.82rem',
                   fontStyle: 'italic',
                 }}
               >
@@ -855,65 +887,112 @@ export default function ReportCard({
               </Typography>
             </Box>
 
-            {/* Counselor Signature & Stamp Area */}
+            {/* Expanded Official Signature Area (Bottom Section - No Stamp, Generous Signing Space) */}
             <Box
               sx={{
                 bgcolor: '#FFFFFF',
                 borderRadius: 3,
-                p: 1.6,
-                border: '1.5px dashed #CBD5E1',
-                textAlign: 'center',
+                p: 2.2,
+                border: '1.5px solid #E2E8F0',
+                boxShadow: '0 4px 14px rgba(15, 23, 42, 0.03)',
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
               }}
             >
-              <Stack direction="row" justifyContent="space-around" alignItems="center">
-                <Box>
-                  <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.6, fontWeight: 700 }}>
-                    مهر و امضای مشاور
+              {/* Status & Verification Top Info */}
+              <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Stack direction="row" spacing={0.8} alignItems="center">
+                  <FileCheck size={16} color="#4F46E5" />
+                  <Typography variant="caption" sx={{ fontWeight: 800, color: '#1E293B', fontSize: '0.8rem' }}>
+                    تاییدیه رسمی شورای آموزشی مدرسه
                   </Typography>
-                  <Box
-                    sx={{
-                      width: 74,
-                      height: 38,
-                      border: '1px dashed #C7D2FE',
-                      borderRadius: 2,
-                      bgcolor: '#F8FAFC',
-                      mx: 'auto',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: '#4F46E5',
-                      fontSize: '0.72rem',
-                      fontWeight: 700,
-                    }}
-                  >
-                    مهر رسمی
-                  </Box>
+                </Stack>
+                <Typography variant="caption" sx={{ color: '#94A3B8', fontWeight: 600, fontSize: '0.74rem' }}>
+                  ثبت قطعی: مهرماه ۱۴۰۵
+                </Typography>
+              </Stack>
+
+              {/* Dual Designated Signature Zones Filling the Vertical Height */}
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, my: 1 }}>
+                {/* Counselor Signature Box */}
+                <Box
+                  sx={{
+                    bgcolor: '#F8FAFC',
+                    borderRadius: 2.5,
+                    p: 1.5,
+                    border: '1px dashed #CBD5E1',
+                    position: 'relative',
+                  }}
+                >
+                  <Stack direction="row" justifyContent="space-between" alignItems="center">
+                    <Box>
+                      <Typography variant="caption" sx={{ fontWeight: 800, color: '#475569', display: 'block', fontSize: '0.78rem' }}>
+                        امضای مشاور تحصیلی پایه
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: '#94A3B8', fontSize: '0.7rem' }}>
+                        مجتمع آموزشی رشد
+                      </Typography>
+                    </Box>
+
+                    {/* Realistic Cursive Signature SVG */}
+                    <Box sx={{ pr: 1 }}>
+                      <svg viewBox="0 0 160 45" style={{ width: '130px', height: '36px' }}>
+                        <path
+                          d="M 12 32 C 26 14, 38 38, 52 18 C 66 6, 76 34, 94 16 C 112 4, 122 40, 146 22 M 30 28 Q 85 26 140 20"
+                          fill="none"
+                          stroke="#3730A3"
+                          strokeWidth="2.2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </Box>
+                  </Stack>
                 </Box>
 
-                <Box>
-                  <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.6, fontWeight: 700 }}>
-                    امضای معاونت آموزشی
-                  </Typography>
-                  <Box
-                    sx={{
-                      width: 74,
-                      height: 38,
-                      border: '1px dashed #A7F3D0',
-                      borderRadius: 2,
-                      bgcolor: '#F8FAFC',
-                      mx: 'auto',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: '#059669',
-                      fontSize: '0.72rem',
-                      fontWeight: 700,
-                    }}
-                  >
-                    تایید نهایی
-                  </Box>
+                {/* Principal Signature Box */}
+                <Box
+                  sx={{
+                    bgcolor: '#F8FAFC',
+                    borderRadius: 2.5,
+                    p: 1.5,
+                    border: '1px dashed #CBD5E1',
+                    position: 'relative',
+                  }}
+                >
+                  <Stack direction="row" justifyContent="space-between" alignItems="center">
+                    <Box>
+                      <Typography variant="caption" sx={{ fontWeight: 800, color: '#475569', display: 'block', fontSize: '0.78rem' }}>
+                        امضای مدیریت آموزشگاه
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: '#94A3B8', fontSize: '0.7rem' }}>
+                        تایید نهایی و صدور کارنامه
+                      </Typography>
+                    </Box>
+
+                    {/* Realistic Cursive Signature SVG */}
+                    <Box sx={{ pr: 1 }}>
+                      <svg viewBox="0 0 160 45" style={{ width: '130px', height: '36px' }}>
+                        <path
+                          d="M 15 26 C 30 6, 44 38, 62 16 C 76 2, 88 36, 108 12 C 122 2, 136 30, 150 18 M 22 36 Q 82 30 144 26"
+                          fill="none"
+                          stroke="#1E1B4B"
+                          strokeWidth="2.4"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </Box>
+                  </Stack>
                 </Box>
-              </Stack>
+              </Box>
+
+              {/* Bottom Notice */}
+              <Typography variant="caption" sx={{ color: '#94A3B8', fontSize: '0.7rem', textAlign: 'center', display: 'block' }}>
+                کارنامه معتبر بدون نیاز به مهر فیزیکی دارای کد پیگیری یکپارچه است
+              </Typography>
             </Box>
           </Box>
         )}
