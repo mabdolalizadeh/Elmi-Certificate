@@ -1004,32 +1004,29 @@ export default function ReportCard({
                     p: 1.5,
                     border: '1px dashed #CBD5E1',
                     position: 'relative',
+                    minHeight: 52,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
                   }}
                 >
-                  <Stack direction="row" justifyContent="space-between" alignItems="center">
-                    <Box>
-                      <Typography variant="caption" sx={{ fontWeight: 800, color: '#475569', display: 'block', fontSize: '0.78rem' }}>
-                        امضای مشاور تحصیلی پایه
-                      </Typography>
-                      <Typography variant="caption" sx={{ color: '#94A3B8', fontSize: '0.7rem' }}>
-                        مجتمع آموزشی رشد
-                      </Typography>
-                    </Box>
+                  <Box>
+                    <Typography variant="caption" sx={{ fontWeight: 800, color: '#475569', display: 'block', fontSize: '0.78rem' }}>
+                      محل امضای مشاور تحصیلی پایه
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: '#94A3B8', fontSize: '0.7rem' }}>
+                      {config.title || 'مجتمع آموزشی رشد'}
+                    </Typography>
+                  </Box>
 
-                    {/* Realistic Cursive Signature SVG */}
-                    <Box sx={{ pr: 1 }}>
-                      <svg viewBox="0 0 160 45" style={{ width: '130px', height: '36px' }}>
-                        <path
-                          d="M 12 32 C 26 14, 38 38, 52 18 C 66 6, 76 34, 94 16 C 112 4, 122 40, 146 22 M 30 28 Q 85 26 140 20"
-                          fill="none"
-                          stroke="#3730A3"
-                          strokeWidth="2.2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </Box>
-                  </Stack>
+                  {/* Clean Designated Signing Space */}
+                  <Box
+                    sx={{
+                      width: 120,
+                      borderBottom: '1.5px dashed #CBD5E1',
+                      height: 24,
+                    }}
+                  />
                 </Box>
 
                 {/* Principal Signature Box */}
@@ -1040,32 +1037,29 @@ export default function ReportCard({
                     p: 1.5,
                     border: '1px dashed #CBD5E1',
                     position: 'relative',
+                    minHeight: 52,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
                   }}
                 >
-                  <Stack direction="row" justifyContent="space-between" alignItems="center">
-                    <Box>
-                      <Typography variant="caption" sx={{ fontWeight: 800, color: '#475569', display: 'block', fontSize: '0.78rem' }}>
-                        امضای مدیریت آموزشگاه
-                      </Typography>
-                      <Typography variant="caption" sx={{ color: '#94A3B8', fontSize: '0.7rem' }}>
-                        تایید نهایی و صدور کارنامه
-                      </Typography>
-                    </Box>
+                  <Box>
+                    <Typography variant="caption" sx={{ fontWeight: 800, color: '#475569', display: 'block', fontSize: '0.78rem' }}>
+                      محل امضای مدیریت آموزشگاه
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: '#94A3B8', fontSize: '0.7rem' }}>
+                      تایید نهایی و صدور کارنامه
+                    </Typography>
+                  </Box>
 
-                    {/* Realistic Cursive Signature SVG */}
-                    <Box sx={{ pr: 1 }}>
-                      <svg viewBox="0 0 160 45" style={{ width: '130px', height: '36px' }}>
-                        <path
-                          d="M 15 26 C 30 6, 44 38, 62 16 C 76 2, 88 36, 108 12 C 122 2, 136 30, 150 18 M 22 36 Q 82 30 144 26"
-                          fill="none"
-                          stroke="#1E1B4B"
-                          strokeWidth="2.4"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </Box>
-                  </Stack>
+                  {/* Clean Designated Signing Space */}
+                  <Box
+                    sx={{
+                      width: 120,
+                      borderBottom: '1.5px dashed #CBD5E1',
+                      height: 24,
+                    }}
+                  />
                 </Box>
               </Box>
 

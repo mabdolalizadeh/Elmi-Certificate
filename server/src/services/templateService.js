@@ -389,25 +389,21 @@ export function generatePdfHtml(students = [], visibility = {}, gradeConfigs = {
 
                 <div class="sig-zones">
                   <!-- Counselor Signature -->
-                  <div class="sig-zone-item">
+                  <div class="sig-zone-item" style="min-height: 46px; display: flex; justify-content: space-between; align-items: center;">
                     <div>
-                      <div class="sig-role">امضای مشاور تحصیلی پایه</div>
-                      <div class="sig-school">مجتمع آموزشی رشد</div>
+                      <div class="sig-role">محل امضای مشاور تحصیلی پایه</div>
+                      <div class="sig-school">${config.title || 'مجتمع آموزشی رشد'}</div>
                     </div>
-                    <svg viewBox="0 0 160 45" style="width:115px; height:32px;">
-                      <path d="M 12 32 C 26 14, 38 38, 52 18 C 66 6, 76 34, 94 16 C 112 4, 122 40, 146 22 M 30 28 Q 85 26 140 20" fill="none" stroke="#3730A3" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
+                    <div style="width: 110px; border-bottom: 1.5px dashed #CBD5E1; height: 20px;"></div>
                   </div>
 
                   <!-- Principal Signature -->
-                  <div class="sig-zone-item">
+                  <div class="sig-zone-item" style="min-height: 46px; display: flex; justify-content: space-between; align-items: center;">
                     <div>
-                      <div class="sig-role">امضای مدیریت آموزشگاه</div>
+                      <div class="sig-role">محل امضای مدیریت آموزشگاه</div>
                       <div class="sig-school">تایید نهایی و صدور کارنامه</div>
                     </div>
-                    <svg viewBox="0 0 160 45" style="width:115px; height:32px;">
-                      <path d="M 15 26 C 30 6, 44 38, 62 16 C 76 2, 88 36, 108 12 C 122 2, 136 30, 150 18 M 22 36 Q 82 30 144 26" fill="none" stroke="#1E1B4B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
+                    <div style="width: 110px; border-bottom: 1.5px dashed #CBD5E1; height: 20px;"></div>
                   </div>
                 </div>
 
