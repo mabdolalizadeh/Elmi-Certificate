@@ -6,6 +6,7 @@ import ReportCardPreviewer from './components/ReportCardPreviewer';
 import ExportModal from './components/ExportModal';
 import ActionSpeedDial from './components/ActionSpeedDial';
 import GradeCustomizationModal from './components/GradeCustomizationModal';
+import DownloadTemplateModal from './components/DownloadTemplateModal';
 import { SAMPLE_STUDENTS, enrichStudentData, parseExcelFile } from './utils/excelService';
 import {
   loadGradeConfigs,
@@ -34,6 +35,7 @@ export default function App() {
   // Grade customization settings state (synced with localStorage)
   const [gradeConfigs, setGradeConfigs] = useState(() => loadGradeConfigs());
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
 
   const [visibility, setVisibility] = useState({
     academic: true,
@@ -296,6 +298,15 @@ export default function App() {
       <ActionSpeedDial
         onFileSelect={handleFileSelect}
         onLoadDemo={handleLoadDemo}
+        onOpenDownloadTemplate={() => setIsTemplateModalOpen(true)}
+      />
+
+      {/* Dynamic Excel Template Download Modal */}
+      <DownloadTemplateModal
+        open={isTemplateModalOpen}
+        onClose={() => setIsTemplateModalOpen(false)}
+        existingStudents={students}
+        availableClasses={availableClasses}
       />
 
       {/* Export Loading & Feedback Modal */}

@@ -17,6 +17,7 @@ import { downloadExcelTemplate } from '../utils/excelService';
 export default function ActionSpeedDial({
   onFileSelect,
   onLoadDemo,
+  onOpenDownloadTemplate,
 }) {
   const fileInputRef = useRef(null);
   const [open, setOpen] = useState(false);
@@ -48,7 +49,11 @@ export default function ActionSpeedDial({
       name: 'دانلود قالب استاندارد اکسل',
       description: 'دریافت فایل نمونه XLSX با سرستون‌های ۱۲ گانه فارسی',
       onClick: () => {
-        downloadExcelTemplate();
+        if (onOpenDownloadTemplate) {
+          onOpenDownloadTemplate();
+        } else {
+          downloadExcelTemplate();
+        }
         setOpen(false);
       },
       color: '#059669',
