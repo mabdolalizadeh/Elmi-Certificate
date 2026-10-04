@@ -23,6 +23,10 @@ import {
   FileCheck,
 } from 'lucide-react';
 import { getDisciplineStyle, toPersianDigits } from '../utils/excelService';
+import {
+  DEFAULT_GRADE_CONFIG,
+  detectGradeFromClassName,
+} from '../utils/gradeConfigService';
 
 export default function ReportCard({
   student,
@@ -34,6 +38,7 @@ export default function ReportCard({
     advisor: true,
   },
   isPdf = false,
+  config = DEFAULT_GRADE_CONFIG,
 }) {
   if (!student) return null;
 
@@ -107,20 +112,68 @@ export default function ReportCard({
         }}
       />
 
-      {/* Decorative Watermark Emblem in Background */}
-      <Box
-        sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          opacity: 0.025,
-          pointerEvents: 'none',
-          userSelect: 'none',
-        }}
-      >
-        <Award size={480} color="#000000" />
-      </Box>
+      {/* Decorative Background Watermark */}
+      {config.watermark?.enabled ? (
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: `translate(-50%, -50%) rotate(${config.watermark.rotation ?? -25}deg)`,
+            opacity: config.watermark.opacity ?? 0.08,
+            pointerEvents: 'none',
+            userSelect: 'none',
+            zIndex: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '100%',
+            height: '100%',
+          }}
+        >
+          {config.watermark.type === 'logo' && (config.watermark.logoUrl || config.logoUrl) ? (
+            <Box
+              component="img"
+              src={config.watermark.logoUrl || config.logoUrl}
+              alt="Watermark Logo"
+              sx={{
+                maxWidth: '52%',
+                maxHeight: '52%',
+                objectFit: 'contain',
+                filter: 'grayscale(100%)',
+              }}
+            />
+          ) : (
+            <Typography
+              sx={{
+                fontSize: { xs: '3rem', md: '5.2rem' },
+                fontWeight: 900,
+                color: '#1E1B4B',
+                whiteSpace: 'nowrap',
+                letterSpacing: '8px',
+                textAlign: 'center',
+              }}
+            >
+              {config.watermark.text || 'کارنامه رسمی و محرمانه'}
+            </Typography>
+          )}
+        </Box>
+      ) : (
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            opacity: 0.025,
+            pointerEvents: 'none',
+            userSelect: 'none',
+            zIndex: 0,
+          }}
+        >
+          <Award size={480} color="#000000" />
+        </Box>
+      )}
 
       {/* ================= REDESIGNED HEADER ================= */}
       <Box
@@ -129,34 +182,59 @@ export default function ReportCard({
           pb: 2.2,
           mb: 2.5,
           position: 'relative',
+          zIndex: 1,
         }}
       >
         <Stack direction="row" alignItems="center" justifyContent="space-between">
-          {/* Right side: School Crest & School Name */}
-          <Stack direction="row" spacing={2} alignItems="center">
-            <Box
-              sx={{
-                width: 54,
-                height: 54,
-                borderRadius: '16px',
-                background: 'linear-gradient(135deg, #1E1B4B 0%, #3730A3 100%)',
-                color: '#FBBF24',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 6px 16px rgba(49, 46, 129, 0.25)',
-                border: '2px solid #E0E7FF',
-              }}
-            >
-              <Award size={32} />
-            </Box>
+          {/* Right side: School Crest/Logo & School Name */}
+          <Stack
+            direction="row"
+            spacing={2}
+            alignItems="center"
+            sx={{
+              flexDirection: config.logoAlignment === 'left' ? 'row-reverse' : 'row',
+            }}
+          >
+            {/* Custom or Default Logo */}
+            {config.logoUrl ? (
+              <Box
+                component="img"
+                src={config.logoUrl}
+                alt="School Logo"
+                sx={{
+                  height: config.logoSize || 54,
+                  maxWidth: (config.logoSize || 54) * 1.6,
+                  objectFit: 'contain',
+                  borderRadius: 2,
+                }}
+              />
+            ) : (
+              <Box
+                sx={{
+                  width: config.logoSize || 54,
+                  height: config.logoSize || 54,
+                  borderRadius: '16px',
+                  background: 'linear-gradient(135deg, #1E1B4B 0%, #3730A3 100%)',
+                  color: '#FBBF24',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 6px 16px rgba(49, 46, 129, 0.25)',
+                  border: '2px solid #E0E7FF',
+                  flexShrink: 0,
+                }}
+              >
+                <Award size={Math.round((config.logoSize || 54) * 0.6)} />
+              </Box>
+            )}
+
             <Box>
               <Stack direction="row" spacing={1} alignItems="center">
                 <Typography variant="h5" sx={{ fontWeight: 900, color: '#1E1B4B', fontSize: '1.25rem', letterSpacing: '-0.3px' }}>
-                  مجتمع آموزشی و دبیرستان نمونه رشد
+                  {config.title || 'مجتمع آموزشی و دبیرستان نمونه رشد'}
                 </Typography>
                 <Chip
-                  label="پایه هفتم"
+                  label={detectGradeFromClassName(student.className) || 'پایه هفتم'}
                   size="small"
                   sx={{
                     bgcolor: '#EEF2FF',
@@ -169,7 +247,7 @@ export default function ReportCard({
                 />
               </Stack>
               <Typography variant="body2" sx={{ color: '#64748B', fontSize: '0.84rem', mt: 0.3 }}>
-                کارنامه رسمی عملکرد تحصیلی، رفتار کلاسی و تحلیل رشد مستمر دانش‌آموز
+                {config.subtitle || 'کارنامه رسمی عملکرد تحصیلی، رفتار کلاسی و تحلیل رشد مستمر دانش‌آموز'}
               </Typography>
             </Box>
           </Stack>
@@ -186,7 +264,7 @@ export default function ReportCard({
             }}
           >
             <Typography variant="caption" sx={{ color: '#94A3B8', display: 'block', fontSize: '0.75rem', fontWeight: 600 }}>
-              سال تحصیلی ۱۴۰۵-۱۴۰۴ • نوبت دوم
+              {config.examPeriod || 'سال تحصیلی ۱۴۰۵-۱۴۰۴ • نوبت دوم'}
             </Typography>
             <Stack direction="row" spacing={1.2} alignItems="center" sx={{ mt: 0.4 }}>
               <Typography variant="h6" sx={{ fontWeight: 900, color: '#0F172A', fontSize: '1.15rem' }}>
@@ -215,6 +293,8 @@ export default function ReportCard({
           gridTemplateColumns: { xs: '1fr', md: '1.15fr 1fr 1.05fr' },
           gap: 2.2,
           flex: 1,
+          position: 'relative',
+          zIndex: 1,
         }}
       >
         {/* ================= RIGHT COLUMN: ACADEMIC PERFORMANCE (BULLET TARGET CHARTS) ================= */}
