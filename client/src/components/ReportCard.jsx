@@ -27,6 +27,7 @@ import {
   DEFAULT_GRADE_CONFIG,
   detectGradeFromClassName,
 } from '../utils/gradeConfigService';
+import ComboBarLineChart from './ComboBarLineChart';
 
 export default function ReportCard({
   student,
@@ -337,18 +338,18 @@ export default function ReportCard({
                     تحلیل مقایسه‌ای نمرات و آزمون‌ها
                   </Typography>
                   <Typography variant="caption" sx={{ color: '#64748B', fontSize: '0.74rem' }}>
-                    نمودار بولت تارگت (مقایسه دوره فعلی و قبلی)
+                    نمودار ترکیبی میله‌ای و خط سیر رشد مقایسه‌ای
                   </Typography>
                 </Box>
               </Stack>
             </Stack>
 
-            {/* Total Exam Score - Bullet Comparison Card */}
+            {/* Total Exam Score - Combo Bar + Line Card */}
             <Box
               sx={{
                 bgcolor: '#FFFFFF',
                 borderRadius: 3,
-                p: 2.2,
+                p: 2,
                 border: '1.5px solid #E2E8F0',
                 boxShadow: '0 4px 14px rgba(15, 23, 42, 0.03)',
                 flex: 1,
@@ -358,8 +359,8 @@ export default function ReportCard({
               }}
             >
               {/* Header & Badges */}
-              <Box sx={{ mb: 1.5 }}>
-                <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0.8 }}>
+              <Box sx={{ mb: 1 }}>
+                <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0.6 }}>
                   <Typography variant="body2" sx={{ fontWeight: 800, color: '#1E293B', fontSize: '0.92rem' }}>
                     درصد آزمون جامع (میانگین کل)
                   </Typography>
@@ -376,95 +377,23 @@ export default function ReportCard({
                 </Stack>
               </Box>
 
-              {/* Stacked Bullet Chart Bar */}
-              <Box sx={{ my: 1 }}>
-                <Box
-                  sx={{
-                    position: 'relative',
-                    width: '100%',
-                    height: 28,
-                    bgcolor: '#F1F5F9',
-                    borderRadius: 2,
-                    overflow: 'hidden',
-                    border: '1px solid #E2E8F0',
-                  }}
-                >
-                  {/* Background Track: Previous Score (Wider Subtle Base) */}
-                  <Box
-                    sx={{
-                      position: 'absolute',
-                      top: 0,
-                      right: 0,
-                      width: `${Math.min(100, Math.max(0, student.prevTotal))}%`,
-                      height: '100%',
-                      bgcolor: 'rgba(99, 102, 241, 0.16)',
-                      borderLeft: '2.5px solid #6366F1',
-                      transition: 'width 0.8s ease',
-                    }}
-                  />
-
-                  {/* Foreground Active Bar: Current Score (Prominent Accent Bar) */}
-                  <Box
-                    sx={{
-                      position: 'absolute',
-                      top: 6,
-                      right: 0,
-                      width: `${Math.min(100, Math.max(0, student.currTotal))}%`,
-                      height: 16,
-                      background: 'linear-gradient(90deg, #4338CA 0%, #4F46E5 100%)',
-                      borderRadius: '0 4px 4px 0',
-                      boxShadow: '0 2px 8px rgba(79, 70, 229, 0.35)',
-                      transition: 'width 0.8s ease',
-                      zIndex: 2,
-                    }}
-                  />
-
-                  {/* Scale Markers at 25%, 50%, 75% */}
-                  {[25, 50, 75].map((pct) => (
-                    <Box
-                      key={pct}
-                      sx={{
-                        position: 'absolute',
-                        top: 0,
-                        right: `${pct}%`,
-                        width: '1px',
-                        height: '100%',
-                        bgcolor: 'rgba(148, 163, 184, 0.35)',
-                        zIndex: 1,
-                      }}
-                    />
-                  ))}
-                </Box>
-
-                {/* Scale & Legend Row */}
-                <Stack direction="row" justifyContent="space-between" sx={{ mt: 0.8, px: 0.5 }}>
-                  <Stack direction="row" spacing={1.5} alignItems="center">
-                    <Stack direction="row" spacing={0.6} alignItems="center">
-                      <Box sx={{ width: 12, height: 6, bgcolor: '#4F46E5', borderRadius: 1 }} />
-                      <Typography variant="caption" sx={{ color: '#475569', fontSize: '0.72rem', fontWeight: 600 }}>
-                        آزمون فعلی
-                      </Typography>
-                    </Stack>
-                    <Stack direction="row" spacing={0.6} alignItems="center">
-                      <Box sx={{ width: 12, height: 10, bgcolor: 'rgba(99, 102, 241, 0.3)', borderLeft: '2px solid #6366F1', borderRadius: 0.5 }} />
-                      <Typography variant="caption" sx={{ color: '#64748B', fontSize: '0.72rem', fontWeight: 600 }}>
-                        تارگت / قبلی
-                      </Typography>
-                    </Stack>
-                  </Stack>
-                  <Typography variant="caption" sx={{ color: '#94A3B8', fontSize: '0.72rem', fontWeight: 700 }}>
-                    مقیاس: ۰ تا ۱۰۰
-                  </Typography>
-                </Stack>
-              </Box>
+              {/* Combo Bar + Line Chart */}
+              <ComboBarLineChart
+                currScore={student.currTotal}
+                prevScore={student.prevTotal}
+                trend={student.overallTrend}
+                barColor="#4F46E5"
+                barGradient={['#3730A3', '#4F46E5']}
+                height={125}
+              />
             </Box>
 
-            {/* Math Score - Bullet Comparison Card */}
+            {/* Math Score - Combo Bar + Line Card */}
             <Box
               sx={{
                 bgcolor: '#FFFFFF',
                 borderRadius: 3,
-                p: 2.2,
+                p: 2,
                 border: '1.5px solid #E2E8F0',
                 boxShadow: '0 4px 14px rgba(15, 23, 42, 0.03)',
                 flex: 1,
@@ -474,8 +403,8 @@ export default function ReportCard({
               }}
             >
               {/* Header & Badges */}
-              <Box sx={{ mb: 1.5 }}>
-                <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0.8 }}>
+              <Box sx={{ mb: 1 }}>
+                <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0.6 }}>
                   <Typography variant="body2" sx={{ fontWeight: 800, color: '#1E293B', fontSize: '0.92rem' }}>
                     درصد درس ریاضی (تخصصی)
                   </Typography>
@@ -492,87 +421,15 @@ export default function ReportCard({
                 </Stack>
               </Box>
 
-              {/* Stacked Bullet Chart Bar */}
-              <Box sx={{ my: 1 }}>
-                <Box
-                  sx={{
-                    position: 'relative',
-                    width: '100%',
-                    height: 28,
-                    bgcolor: '#F1F5F9',
-                    borderRadius: 2,
-                    overflow: 'hidden',
-                    border: '1px solid #E2E8F0',
-                  }}
-                >
-                  {/* Background Track: Previous Score (Wider Subtle Base) */}
-                  <Box
-                    sx={{
-                      position: 'absolute',
-                      top: 0,
-                      right: 0,
-                      width: `${Math.min(100, Math.max(0, student.prevMath))}%`,
-                      height: '100%',
-                      bgcolor: 'rgba(2, 132, 199, 0.16)',
-                      borderLeft: '2.5px solid #0284C7',
-                      transition: 'width 0.8s ease',
-                    }}
-                  />
-
-                  {/* Foreground Active Bar: Current Score (Prominent Accent Bar) */}
-                  <Box
-                    sx={{
-                      position: 'absolute',
-                      top: 6,
-                      right: 0,
-                      width: `${Math.min(100, Math.max(0, student.currMath))}%`,
-                      height: 16,
-                      background: 'linear-gradient(90deg, #0369A1 0%, #0EA5E9 100%)',
-                      borderRadius: '0 4px 4px 0',
-                      boxShadow: '0 2px 8px rgba(2, 132, 199, 0.35)',
-                      transition: 'width 0.8s ease',
-                      zIndex: 2,
-                    }}
-                  />
-
-                  {/* Scale Markers at 25%, 50%, 75% */}
-                  {[25, 50, 75].map((pct) => (
-                    <Box
-                      key={pct}
-                      sx={{
-                        position: 'absolute',
-                        top: 0,
-                        right: `${pct}%`,
-                        width: '1px',
-                        height: '100%',
-                        bgcolor: 'rgba(148, 163, 184, 0.35)',
-                        zIndex: 1,
-                      }}
-                    />
-                  ))}
-                </Box>
-
-                {/* Scale & Legend Row */}
-                <Stack direction="row" justifyContent="space-between" sx={{ mt: 0.8, px: 0.5 }}>
-                  <Stack direction="row" spacing={1.5} alignItems="center">
-                    <Stack direction="row" spacing={0.6} alignItems="center">
-                      <Box sx={{ width: 12, height: 6, bgcolor: '#0284C7', borderRadius: 1 }} />
-                      <Typography variant="caption" sx={{ color: '#475569', fontSize: '0.72rem', fontWeight: 600 }}>
-                        آزمون فعلی
-                      </Typography>
-                    </Stack>
-                    <Stack direction="row" spacing={0.6} alignItems="center">
-                      <Box sx={{ width: 12, height: 10, bgcolor: 'rgba(2, 132, 199, 0.3)', borderLeft: '2px solid #0284C7', borderRadius: 0.5 }} />
-                      <Typography variant="caption" sx={{ color: '#64748B', fontSize: '0.72rem', fontWeight: 600 }}>
-                        تارگت / قبلی
-                      </Typography>
-                    </Stack>
-                  </Stack>
-                  <Typography variant="caption" sx={{ color: '#94A3B8', fontSize: '0.72rem', fontWeight: 700 }}>
-                    مقیاس: ۰ تا ۱۰۰
-                  </Typography>
-                </Stack>
-              </Box>
+              {/* Combo Bar + Line Chart */}
+              <ComboBarLineChart
+                currScore={student.currMath}
+                prevScore={student.prevMath}
+                trend={student.mathTrend}
+                barColor="#0284C7"
+                barGradient={['#0369A1', '#0EA5E9']}
+                height={125}
+              />
             </Box>
           </Box>
         )}

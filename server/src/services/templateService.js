@@ -100,6 +100,84 @@ export function generatePdfHtml(students = [], visibility = {}, gradeConfigs = {
     `;
   };
 
+  const renderComboChartSvg = (currScore = 0, prevScore = 0, barColor = '#4F46E5', barGradient = ['#3730A3', '#4F46E5'], chartId = 'c1') => {
+    const safeCurr = Math.min(100, Math.max(0, Number(currScore) || 0));
+    const safePrev = Math.min(100, Math.max(0, Number(prevScore) || 0));
+    const diff = safeCurr - safePrev;
+    const trendLineColor = diff > 2 ? '#10B981' : diff < -2 ? '#F43F5E' : '#64748B';
+
+    const baselineY = 90;
+    const maxBarH = 68;
+    const prevBarH = (safePrev / 100) * maxBarH;
+    const prevY = baselineY - prevBarH;
+    const currBarH = (safeCurr / 100) * maxBarH;
+    const currY = baselineY - currBarH;
+
+    const prevX = 215;
+    const currX = 95;
+    const barWidth = 42;
+    const midX = (prevX + currX) / 2;
+    const pathD = `M ${prevX} ${prevY} C ${midX} ${prevY}, ${midX} ${currY}, ${currX} ${currY}`;
+
+    const gridLines = [0, 25, 50, 75, 100].map(level => {
+      const yPos = baselineY - (level / 100) * maxBarH;
+      return `
+        <line x1="45" y1="${yPos}" x2="275" y2="${yPos}" stroke="${level === 0 ? '#CBD5E1' : '#E2E8F0'}" stroke-width="${level === 0 ? '1.5' : '1'}" stroke-dasharray="${level === 0 ? 'none' : '3 3'}" />
+        <text x="35" y="${yPos + 3.5}" text-anchor="end" fill="#94A3B8" font-size="8.5" font-weight="600" font-family="Vazirmatn, sans-serif">${toPersianDigits(level)}</text>
+      `;
+    }).join('');
+
+    return `
+      <div style="width:100%; margin-top: 2px;">
+        <svg viewBox="0 0 320 122" style="width:100%; height:110px; display:block; overflow:visible;">
+          <defs>
+            <linearGradient id="grad_${chartId}" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="${barGradient[1]}" />
+              <stop offset="100%" stop-color="${barGradient[0]}" />
+            </linearGradient>
+            <linearGradient id="prevGrad_${chartId}" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#94A3B8" />
+              <stop offset="100%" stop-color="#64748B" />
+            </linearGradient>
+          </defs>
+
+          ${gridLines}
+
+          <!-- Previous Bar -->
+          <rect x="${prevX - barWidth / 2}" y="${prevY}" width="${barWidth}" height="${prevBarH}" rx="5" fill="url(#prevGrad_${chartId})" opacity="0.88" />
+
+          <!-- Current Bar -->
+          <rect x="${currX - barWidth / 2}" y="${currY}" width="${barWidth}" height="${currBarH}" rx="5" fill="url(#grad_${chartId})" />
+
+          <!-- Connecting Monotone Line -->
+          <path d="${pathD}" fill="none" stroke="${trendLineColor}" stroke-width="2.8" stroke-linecap="round" />
+
+          <!-- Node Circles -->
+          <circle cx="${prevX}" cy="${prevY}" r="4.5" fill="#FFFFFF" stroke="#64748B" stroke-width="2.5" />
+          <circle cx="${currX}" cy="${currY}" r="5" fill="#FFFFFF" stroke="${trendLineColor}" stroke-width="2.8" />
+
+          <!-- Score Labels Top -->
+          <text x="${prevX}" y="${Math.max(12, prevY - 6)}" text-anchor="middle" fill="#475569" font-size="11" font-weight="800" font-family="Vazirmatn, sans-serif">٪${toPersianDigits(safePrev)}</text>
+          <text x="${currX}" y="${Math.max(12, currY - 6)}" text-anchor="middle" fill="${barColor}" font-size="12" font-weight="900" font-family="Vazirmatn, sans-serif">٪${toPersianDigits(safeCurr)}</text>
+
+          <!-- Category Labels Bottom -->
+          <text x="${prevX}" y="110" text-anchor="middle" fill="#64748B" font-size="9.5" font-weight="700" font-family="Vazirmatn, sans-serif">آزمون قبلی</text>
+          <text x="${currX}" y="110" text-anchor="middle" fill="#1E293B" font-size="10" font-weight="800" font-family="Vazirmatn, sans-serif">آزمون فعلی</text>
+        </svg>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; padding: 3px 6px 0 6px; border-top: 1px solid #F1F5F9; font-size:9.5px; font-weight:700;">
+          <div style="display:flex; gap:10px; align-items:center;">
+            <span style="display:inline-flex; align-items:center; gap:4px; color:#1E293B;"><span style="width:8px; height:8px; background:${barColor}; border-radius:2px; display:inline-block;"></span>فعلی</span>
+            <span style="display:inline-flex; align-items:center; gap:4px; color:#64748B;"><span style="width:8px; height:8px; background:#94A3B8; border-radius:2px; display:inline-block;"></span>قبلی</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:4px; color:${trendLineColor}; font-weight:800;">
+            <span style="width:12px; height:2.5px; background:${trendLineColor}; border-radius:2px; display:inline-block;"></span>خط سیر رشد
+          </div>
+        </div>
+      </div>
+    `;
+  };
+
   const studentPages = students
     .map((student, idx) => {
       const discipline = getDisciplineDetails(student.discipline);
@@ -235,7 +313,7 @@ export function generatePdfHtml(students = [], visibility = {}, gradeConfigs = {
                 <span>تحلیل مقایسه‌ای نمرات و آزمون‌ها</span>
               </div>
 
-              <!-- Total Score Bullet Card -->
+              <!-- Total Score Combo Card -->
               <div class="metric-box">
                 <div class="metric-head">
                   <span class="metric-label">درصد آزمون جامع (میانگین کل)</span>
@@ -245,27 +323,10 @@ export function generatePdfHtml(students = [], visibility = {}, gradeConfigs = {
                   <span class="curr-score" style="color:#4F46E5;">٪${toPersianDigits(student.currTotal)}</span>
                   <span class="prev-score">دوره قبلی: ٪${toPersianDigits(student.prevTotal)}</span>
                 </div>
-
-                <!-- Stacked Bullet Chart -->
-                <div class="bullet-track-wrap">
-                  <div class="bullet-track">
-                    <div class="bullet-target" style="width: ${Math.min(100, Math.max(0, student.prevTotal))}%;"></div>
-                    <div class="bullet-actual" style="width: ${Math.min(100, Math.max(0, student.currTotal))}%; background: linear-gradient(90deg, #4338CA, #4F46E5);"></div>
-                    <div class="bullet-tick" style="right: 25%;"></div>
-                    <div class="bullet-tick" style="right: 50%;"></div>
-                    <div class="bullet-tick" style="right: 75%;"></div>
-                  </div>
-                  <div class="bullet-legend">
-                    <div class="legend-items">
-                      <span class="legend-item"><span class="dot" style="background:#4F46E5;"></span>آزمون فعلی</span>
-                      <span class="legend-item"><span class="dot" style="background:rgba(99, 102, 241, 0.35); border-left:2px solid #6366F1;"></span>تارگت / قبلی</span>
-                    </div>
-                    <span class="scale-label">مقیاس: ۰ تا ۱۰۰</span>
-                  </div>
-                </div>
+                ${renderComboChartSvg(student.currTotal, student.prevTotal, '#4F46E5', ['#3730A3', '#4F46E5'], 'tot_' + idx)}
               </div>
 
-              <!-- Math Score Bullet Card -->
+              <!-- Math Score Combo Card -->
               <div class="metric-box" style="margin-top:10px;">
                 <div class="metric-head">
                   <span class="metric-label">درصد درس ریاضی (تخصصی)</span>
@@ -275,24 +336,7 @@ export function generatePdfHtml(students = [], visibility = {}, gradeConfigs = {
                   <span class="curr-score" style="color:#0284C7;">٪${toPersianDigits(student.currMath)}</span>
                   <span class="prev-score">دوره قبلی: ٪${toPersianDigits(student.prevMath)}</span>
                 </div>
-
-                <!-- Stacked Bullet Chart -->
-                <div class="bullet-track-wrap">
-                  <div class="bullet-track">
-                    <div class="bullet-target" style="width: ${Math.min(100, Math.max(0, student.prevMath))}%; background:rgba(2, 132, 199, 0.16); border-left-color:#0284C7;"></div>
-                    <div class="bullet-actual" style="width: ${Math.min(100, Math.max(0, student.currMath))}%; background: linear-gradient(90deg, #0369A1, #0EA5E9);"></div>
-                    <div class="bullet-tick" style="right: 25%;"></div>
-                    <div class="bullet-tick" style="right: 50%;"></div>
-                    <div class="bullet-tick" style="right: 75%;"></div>
-                  </div>
-                  <div class="bullet-legend">
-                    <div class="legend-items">
-                      <span class="legend-item"><span class="dot" style="background:#0284C7;"></span>آزمون فعلی</span>
-                      <span class="legend-item"><span class="dot" style="background:rgba(2, 132, 199, 0.35); border-left:2px solid #0284C7;"></span>تارگت / قبلی</span>
-                    </div>
-                    <span class="scale-label">مقیاس: ۰ تا ۱۰۰</span>
-                  </div>
-                </div>
+                ${renderComboChartSvg(student.currMath, student.prevMath, '#0284C7', ['#0369A1', '#0EA5E9'], 'mth_' + idx)}
               </div>
             </div>
             `
