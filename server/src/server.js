@@ -1,6 +1,11 @@
 import express from 'express';
 import cors from 'cors';
 import pdfRoutes from './routes/pdfRoutes.js';
+import reportRoutes from './routes/reportRoutes.js';
+import { initDatabase } from './db/database.js';
+
+// Initialize SQLite schema and tables
+initDatabase();
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -20,6 +25,9 @@ app.get('/api/health', (req, res) => {
 
 // PDF routes
 app.use('/api', pdfRoutes);
+
+// Report & Longitudinal History routes
+app.use('/api/reports', reportRoutes);
 
 if (process.env.NODE_ENV !== 'test') {
   app.listen(PORT, () => {

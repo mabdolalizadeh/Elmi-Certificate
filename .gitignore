@@ -22,6 +22,10 @@ storybook-static/
 /tmp/
 /downloads/
 .puppeteer/
+*.db
+*.db-wal
+*.db-shm
+server/data/
 
 # ==========================================
 # Excel & User Uploads
