@@ -12,6 +12,7 @@ import {
   Switch,
   FormControlLabel,
   Badge,
+  Tooltip,
 } from '@mui/material';
 import {
   Search,
@@ -28,6 +29,7 @@ import {
   CalendarX2,
   ShieldCheck,
   Quote,
+  Settings,
 } from 'lucide-react';
 import { toPersianDigits } from '../utils/excelService';
 
@@ -47,6 +49,7 @@ export default function FiltersDropdownToolbar({
   onToggleSelectAll,
   onExportPdf,
   isExporting,
+  onOpenSettings,
 }) {
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -148,6 +151,33 @@ export default function FiltersDropdownToolbar({
             </Button>
           </Badge>
 
+          {/* Customization Settings Button */}
+          {onOpenSettings && (
+            <Tooltip title="شخصی‌سازی عناوین، لوگو و واترمارک به تفکیک پایه">
+              <Button
+                variant="outlined"
+                onClick={onOpenSettings}
+                startIcon={<Settings size={16} />}
+                sx={{
+                  borderColor: '#CBD5E1',
+                  color: '#334155',
+                  bgcolor: '#F8FAFC',
+                  fontWeight: 700,
+                  borderRadius: 2.5,
+                  px: 2,
+                  whiteSpace: 'nowrap',
+                  '&:hover': {
+                    borderColor: '#4F46E5',
+                    bgcolor: '#EEF2FF',
+                    color: '#4F46E5',
+                  },
+                }}
+              >
+                شخصی‌سازی کارنامه
+              </Button>
+            </Tooltip>
+          )}
+
           {/* Active Filter Chips summary */}
           {selectedClass !== 'ALL' && (
             <Chip
@@ -241,9 +271,16 @@ export default function FiltersDropdownToolbar({
           },
         }}
       >
-        <Stack spacing={2.2}>
+        <Stack spacing={2.2} sx={{
+          p: 2
+        }}>
           {/* Header */}
-          <Stack direction="row" justifyContent="space-between" alignItems="center">
+          <Stack sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}>
             <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#1E1B4B' }}>
               تنظیمات فیلترها و بخش‌های کارنامه
             </Typography>

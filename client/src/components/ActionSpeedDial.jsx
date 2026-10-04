@@ -31,6 +31,7 @@ export default function ActionSpeedDial({
     }
   };
 
+  // name not work here
   const actions = [
     {
       icon: <UploadCloud size={22} />,
@@ -51,16 +52,6 @@ export default function ActionSpeedDial({
         setOpen(false);
       },
       color: '#059669',
-    },
-    {
-      icon: <Sparkles size={22} />,
-      name: 'بارگذاری اطلاعات نمونه پایه هفتم',
-      description: 'بارگذاری داده‌های پیش‌فرض ۶ دانش‌آموز جهت تست فوری',
-      onClick: () => {
-        onLoadDemo();
-        setOpen(false);
-      },
-      color: '#D97706',
     },
   ];
 

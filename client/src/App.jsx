@@ -5,7 +5,14 @@ import FiltersDropdownToolbar from './components/FiltersDropdownToolbar';
 import ReportCardPreviewer from './components/ReportCardPreviewer';
 import ExportModal from './components/ExportModal';
 import ActionSpeedDial from './components/ActionSpeedDial';
+import GradeCustomizationModal from './components/GradeCustomizationModal';
 import { SAMPLE_STUDENTS, enrichStudentData, parseExcelFile } from './utils/excelService';
+import {
+  loadGradeConfigs,
+  saveGradeConfigs,
+  extractUniqueScopes,
+  resolveConfigForStudent,
+} from './utils/gradeConfigService';
 
 export default function App() {
   const [selectedGrade, setSelectedGrade] = useState('7th');
@@ -24,6 +31,10 @@ export default function App() {
   const [selectedTrend, setSelectedTrend] = useState('ALL');
   const [currentPreviewIndex, setCurrentPreviewIndex] = useState(0);
 
+  // Grade customization settings state (synced with localStorage)
+  const [gradeConfigs, setGradeConfigs] = useState(() => loadGradeConfigs());
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
   const [visibility, setVisibility] = useState({
     academic: true,
     attendance: true,
@@ -41,7 +52,9 @@ export default function App() {
 
   const [notification, setNotification] = useState(null);
 
-  // Available unique classes
+  // Available unique classes and grades
+  const uniqueScopes = useMemo(() => extractUniqueScopes(students), [students]);
+
   const availableClasses = useMemo(() => {
     const set = new Set();
     students.forEach((s) => {
@@ -49,6 +62,15 @@ export default function App() {
     });
     return Array.from(set);
   }, [students]);
+
+  const handleSaveGradeConfigs = (newConfigs) => {
+    setGradeConfigs(newConfigs);
+    saveGradeConfigs(newConfigs);
+    setNotification({
+      severity: 'success',
+      message: 'تنظیمات اختصاصی با موفقیت ذخیره و اعمال گردید.',
+    });
+  };
 
   // Filter students based on search term, class, and trend
   const filteredStudents = useMemo(() => {
@@ -245,6 +267,7 @@ export default function App() {
           onToggleSelectAll={handleToggleSelectAll}
           onExportPdf={handleExportPdf}
           isExporting={exportModalState.open && exportModalState.status === 'loading'}
+          onOpenSettings={() => setIsSettingsOpen(true)}
         />
 
         {/* Live Certificate Previewer */}
@@ -254,9 +277,20 @@ export default function App() {
             visibility={visibility}
             currentIndex={currentPreviewIndex}
             onIndexChange={setCurrentPreviewIndex}
+            gradeConfigs={gradeConfigs}
           />
         </Box>
       </Box>
+
+      {/* Grade Customization Settings Modal */}
+      <GradeCustomizationModal
+        open={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        gradeConfigs={gradeConfigs}
+        onSaveConfigs={handleSaveGradeConfigs}
+        availableGrades={uniqueScopes.grades}
+        availableClasses={uniqueScopes.classes}
+      />
 
       {/* SpeedDial Floating Button for Upload and Download */}
       <ActionSpeedDial

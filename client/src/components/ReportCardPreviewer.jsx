@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import ReportCard from './ReportCard';
 import { toPersianDigits } from '../utils/excelService';
+import { resolveConfigForStudent } from '../utils/gradeConfigService';
 
 // Framer motion slide variants
 const variants = {
@@ -56,6 +57,7 @@ export default function ReportCardPreviewer({
   visibility,
   currentIndex,
   onIndexChange,
+  gradeConfigs = {},
 }) {
   const [[page, direction], setPage] = useState([currentIndex || 0, 0]);
 
@@ -258,7 +260,11 @@ export default function ReportCardPreviewer({
             exit="exit"
             style={{ width: '100%' }}
           >
-            <ReportCard student={currentStudent} visibility={visibility} />
+            <ReportCard
+              student={currentStudent}
+              visibility={visibility}
+              config={resolveConfigForStudent(currentStudent, gradeConfigs)}
+            />
           </motion.div>
         </AnimatePresence>
       </Box>
