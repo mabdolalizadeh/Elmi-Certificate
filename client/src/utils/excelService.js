@@ -374,29 +374,41 @@ export const downloadExcelTemplate = ({
   month = 'آبان',
   studentList = [],
 } = {}) => {
-  // Use provided roster or empty starter rows
-  const roster = studentList.length > 0 ? studentList : [
-    { id: 'std-001', name: '' },
-    { id: 'std-002', name: '' },
-    { id: 'std-003', name: '' },
-    { id: 'std-004', name: '' },
-    { id: 'std-005', name: '' },
-  ];
+  let rows = [];
 
-  const rows = roster.map((s, idx) => ({
-    'شناسه (UUID)': s.id || `std-${String(idx + 1).padStart(3, '0')}`,
-    'نام و نام خانوادگی': s.name || '',
-    'سال': year,
-    'ماه': month,
-    'درصد کل': s.currTotal ?? '',
-    'درصد ریاضی': s.currMath ?? '',
-    'غیبت': s.absences ?? '',
-    'تاخیر': s.tardies ?? '',
-    'وضعیت انضباط': s.discipline || '',
-    'تکالیف تحویل شده': s.homeworkSubmitted ?? '',
-    'کل تکالیف': s.homeworkTotal ?? '',
-    'نکته مشاورهای': s.advisorNote || '',
-  }));
+  if (studentList && studentList.length > 0) {
+    // If the user has defined/registered students, populate their UUID and Name with empty score fields
+    rows = studentList.map((s, idx) => ({
+      'شناسه (UUID)': s.id || `std-${String(idx + 1).padStart(3, '0')}`,
+      'نام و نام خانوادگی': s.name || '',
+      'سال': year,
+      'ماه': month,
+      'درصد کل': '',
+      'درصد ریاضی': '',
+      'غیبت': '',
+      'تاخیر': '',
+      'وضعیت انضباط': '',
+      'تکالیف تحویل شده': '',
+      'کل تکالیف': '',
+      'نکته مشاورهای': '',
+    }));
+  } else {
+    // Completely clean, empty starter template (15 blank rows) - ZERO mock students or fake scores
+    rows = Array.from({ length: 15 }, () => ({
+      'شناسه (UUID)': '',
+      'نام و نام خانوادگی': '',
+      'سال': year,
+      'ماه': month,
+      'درصد کل': '',
+      'درصد ریاضی': '',
+      'غیبت': '',
+      'تاخیر': '',
+      'وضعیت انضباط': '',
+      'تکالیف تحویل شده': '',
+      'کل تکالیف': '',
+      'نکته مشاورهای': '',
+    }));
+  }
 
   const worksheet = XLSX.utils.json_to_sheet(rows, {
     header: DYNAMIC_TEMPLATE_HEADERS,
@@ -405,7 +417,7 @@ export const downloadExcelTemplate = ({
   // Set explicit, comfortable column widths
   worksheet['!cols'] = [
     { wch: 18 }, // شناسه (UUID)
-    { wch: 22 }, // نام و نام خانوادگی
+    { wch: 24 }, // نام و نام خانوادگی
     { wch: 10 }, // سال
     { wch: 12 }, // ماه
     { wch: 14 }, // درصد کل
@@ -421,7 +433,7 @@ export const downloadExcelTemplate = ({
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, `کارنامه ${month} ${year}`);
 
-  // Generate filename with selected month and year
+  // Generate clean filename with selected month and year
   const safeFilename = className
     ? `قالب_کارنامه_${className.replace(/\s+/g, '_')}_${month}_${year}.xlsx`
     : `قالب_کارنامه_${month}_${year}.xlsx`;
