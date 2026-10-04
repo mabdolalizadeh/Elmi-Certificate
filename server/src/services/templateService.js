@@ -8,7 +8,52 @@ const toPersianDigits = (num) => {
   return String(num).replace(/[0-9]/g, (w) => persianDigits[+w]);
 };
 
-export function generatePdfHtml(students = [], visibility = {}) {
+const DEFAULT_GRADE_CONFIG = {
+  title: 'مجتمع آموزشی و دبیرستان نمونه رشد',
+  subtitle: 'کارنامه رسمی عملکرد تحصیلی، رفتار کلاسی و تحلیل رشد مستمر دانش‌آموز',
+  examPeriod: 'سال تحصیلی ۱۴۰۵-۱۴۰۴ • نوبت دوم',
+  logoUrl: '',
+  logoAlignment: 'right',
+  logoSize: 44,
+  watermark: {
+    enabled: false,
+    type: 'text',
+    text: 'کارنامه رسمی و محرمانه',
+    opacity: 0.08,
+    rotation: -25,
+    logoUrl: '',
+  },
+};
+
+const detectGradeFromClassName = (className = '') => {
+  if (!className) return 'پایه هفتم';
+  const c = String(className).trim();
+  if (c.includes('هفتم') || c.startsWith('7') || c.includes('۷')) return 'پایه هفتم';
+  if (c.includes('هشتم') || c.startsWith('8') || c.includes('۸')) return 'پایه هشتم';
+  if (c.includes('نهم') || c.startsWith('9') || c.includes('۹')) return 'پایه نهم';
+  if (c.includes('دهم') || c.startsWith('10') || c.includes('۱۰')) return 'پایه دهم';
+  if (c.includes('یازدهم') || c.startsWith('11') || c.includes('۱۱')) return 'پایه یازدهم';
+  if (c.includes('دوازدهم') || c.startsWith('12') || c.includes('۱۲')) return 'پایه دوازدهم';
+  return 'پایه هفتم';
+};
+
+const resolveConfigForStudent = (student, gradeConfigs = {}) => {
+  const defaultCfg = gradeConfigs.DEFAULT || DEFAULT_GRADE_CONFIG;
+  if (!student) return defaultCfg;
+
+  if (student.className && gradeConfigs[student.className]) {
+    return { ...defaultCfg, ...gradeConfigs[student.className] };
+  }
+
+  const detectedGrade = detectGradeFromClassName(student.className);
+  if (detectedGrade && gradeConfigs[detectedGrade]) {
+    return { ...defaultCfg, ...gradeConfigs[detectedGrade] };
+  }
+
+  return defaultCfg;
+};
+
+export function generatePdfHtml(students = [], visibility = {}, gradeConfigs = {}) {
   const vis = {
     academic: visibility.academic !== false,
     attendance: visibility.attendance !== false,
@@ -52,6 +97,8 @@ export function generatePdfHtml(students = [], visibility = {}) {
     .map((student, idx) => {
       const discipline = getDisciplineDetails(student.discipline);
       const isLast = idx === students.length - 1;
+      const config = resolveConfigForStudent(student, gradeConfigs);
+      const gradeName = detectGradeFromClassName(student.className);
 
       // Homework gauge calculations
       const hwRate = Math.min(100, Math.max(0, student.homeworkRate || 0));
@@ -74,21 +121,76 @@ export function generatePdfHtml(students = [], visibility = {}) {
           <!-- Top decorative gradient strip -->
           <div class="card-strip"></div>
 
+          <!-- BACKGROUND WATERMARK (CALIBRATED PRINT FIDELITY) -->
+          ${
+            config.watermark?.enabled
+              ? `
+          <div class="watermark-container" style="
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(${config.watermark.rotation ?? -25}deg);
+            opacity: ${config.watermark.opacity !== undefined ? config.watermark.opacity : 0.08};
+            pointer-events: none;
+            user-select: none;
+            z-index: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+          ">
+            ${
+              config.watermark.type === 'logo' && (config.watermark.logoUrl || config.logoUrl)
+                ? `<img src="${config.watermark.logoUrl || config.logoUrl}" alt="Watermark" style="max-width: 50%; max-height: 50%; object-fit: contain; filter: grayscale(100%);" />`
+                : `<div style="font-size: 52px; font-weight: 900; color: #1E1B4B; white-space: nowrap; letter-spacing: 8px; text-transform: uppercase;">
+                    ${config.watermark.text || 'کارنامه رسمی و محرمانه'}
+                  </div>`
+            }
+          </div>
+          `
+              : `
+          <div class="watermark-container" style="
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.02;
+            pointer-events: none;
+            user-select: none;
+            z-index: 0;
+            font-size: 260px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            color: #000;
+          ">
+            🎓
+          </div>
+          `
+          }
+
           <!-- HEADER -->
-          <div class="card-header">
-            <div class="school-info">
-              <div class="school-icon">🎓</div>
+          <div class="card-header" style="position: relative; z-index: 1;">
+            <div class="school-info" style="${config.logoAlignment === 'left' ? 'flex-direction: row-reverse;' : ''}">
+              ${
+                config.logoUrl
+                  ? `<img src="${config.logoUrl}" alt="School Logo" style="height:${config.logoSize || 44}px; max-width:${(config.logoSize || 44) * 1.6}px; object-fit:contain; border-radius:8px;" />`
+                  : `<div class="school-icon" style="width:${config.logoSize || 44}px; height:${config.logoSize || 44}px;">🎓</div>`
+              }
               <div>
                 <div class="school-name">
-                  <span>مجتمع آموزشی و دبیرستان نمونه رشد</span>
-                  <span class="grade-pill">پایه هفتم</span>
+                  <span>${config.title || 'مجتمع آموزشی و دبیرستان نمونه رشد'}</span>
+                  <span class="grade-pill">${gradeName}</span>
                 </div>
-                <div class="school-sub">کارنامه رسمی عملکرد تحصیلی، رفتار کلاسی و تحلیل رشد مستمر دانش‌آموز</div>
+                <div class="school-sub">${config.subtitle || 'کارنامه رسمی عملکرد تحصیلی، رفتار کلاسی و تحلیل رشد مستمر دانش‌آموز'}</div>
               </div>
             </div>
 
             <div class="student-info">
-              <div class="report-meta">سال تحصیلی ۱۴۰۵-۱۴۰۴ • نوبت دوم</div>
+              <div class="report-meta">${config.examPeriod || 'سال تحصیلی ۱۴۰۵-۱۴۰۴ • نوبت دوم'}</div>
               <div class="student-meta">
                 <span class="student-name">${student.name || 'دانش‌آموز'}</span>
                 <span class="class-badge">کلاس ${student.className || 'عمومی'}</span>
@@ -97,7 +199,7 @@ export function generatePdfHtml(students = [], visibility = {}) {
           </div>
 
           <!-- 3-COLUMN BODY (ZERO DEAD SPACE) -->
-          <div class="card-body">
+          <div class="card-body" style="position: relative; z-index: 1;">
 
             <!-- RIGHT COLUMN: ACADEMIC (BULLET TARGET CHARTS) -->
             ${
@@ -394,6 +496,12 @@ export function generatePdfHtml(students = [], visibility = {}) {
       right: 0;
       height: 6px;
       background: linear-gradient(90deg, #312E81 0%, #4F46E5 25%, #F59E0B 50%, #10B981 75%, #059669 100%);
+    }
+    .watermark-container {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+      pointer-events: none;
+      user-select: none;
     }
     /* Header */
     .card-header {

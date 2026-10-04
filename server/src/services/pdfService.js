@@ -17,8 +17,8 @@ function getChromeExecutablePath() {
 /**
  * Compile student records into multi-page landscape PDF
  */
-export async function compileLandscapePdf(students = [], visibility = {}) {
-  const htmlContent = generatePdfHtml(students, visibility);
+export async function compileLandscapePdf(students = [], visibility = {}, gradeConfigs = {}) {
+  const htmlContent = generatePdfHtml(students, visibility, gradeConfigs);
 
   const executablePath = getChromeExecutablePath();
   const launchOptions = {

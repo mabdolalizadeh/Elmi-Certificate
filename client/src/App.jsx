@@ -176,23 +176,23 @@ export default function App() {
       const apiUrl = window.location.port === '5173' ? '/api/generate-pdf' : 'http://localhost:5001/api/generate-pdf';
       let response;
 
+      const exportPayload = {
+        students: studentsToExport,
+        visibility,
+        gradeConfigs,
+      };
+
       try {
         response = await fetch(apiUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            students: studentsToExport,
-            visibility,
-          }),
+          body: JSON.stringify(exportPayload),
         });
       } catch (networkErr) {
         response = await fetch('http://localhost:5001/api/generate-pdf', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            students: studentsToExport,
-            visibility,
-          }),
+          body: JSON.stringify(exportPayload),
         });
       }
 

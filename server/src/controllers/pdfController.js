@@ -2,7 +2,7 @@ import { compileLandscapePdf } from '../services/pdfService.js';
 
 export async function generatePdf(req, res) {
   try {
-    const { students, visibility } = req.body;
+    const { students, visibility, gradeConfigs = {} } = req.body;
 
     if (!students || !Array.isArray(students) || students.length === 0) {
       return res.status(400).json({
@@ -13,7 +13,7 @@ export async function generatePdf(req, res) {
     const startTime = Date.now();
     console.log(`[PDF] Generating multi-page landscape PDF for ${students.length} students...`);
 
-    const pdfBuffer = await compileLandscapePdf(students, visibility);
+    const pdfBuffer = await compileLandscapePdf(students, visibility, gradeConfigs);
 
     const duration = Date.now() - startTime;
     console.log(`[PDF] Generated successfully in ${duration}ms (${pdfBuffer.length} bytes).`);
