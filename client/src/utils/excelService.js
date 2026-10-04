@@ -3,6 +3,8 @@ import * as XLSX from 'xlsx';
 export const EXCEL_HEADERS = {
   NAME: 'نام و نام خانوادگی',
   CLASS: 'کلاس',
+  YEAR: 'سال تحصیلی',
+  MONTH: 'ماه',
   ABSENCES: 'تعداد غیبت',
   TARDIES: 'تعداد تاخیر',
   DISCIPLINE: 'وضعیت انضباط',
@@ -34,6 +36,8 @@ export const SAMPLE_STUDENTS = [
   {
     [EXCEL_HEADERS.NAME]: 'علیرضا حسینی',
     [EXCEL_HEADERS.CLASS]: 'هفتم ۱',
+    [EXCEL_HEADERS.YEAR]: 'سال تحصیلی ۱۴۰۵-۱۴۰۴',
+    [EXCEL_HEADERS.MONTH]: 'مهرماه',
     [EXCEL_HEADERS.ABSENCES]: 1,
     [EXCEL_HEADERS.TARDIES]: 2,
     [EXCEL_HEADERS.DISCIPLINE]: 'عالی',
@@ -48,6 +52,8 @@ export const SAMPLE_STUDENTS = [
   {
     [EXCEL_HEADERS.NAME]: 'محمد صادقی',
     [EXCEL_HEADERS.CLASS]: 'هفتم ۱',
+    [EXCEL_HEADERS.YEAR]: 'سال تحصیلی ۱۴۰۵-۱۴۰۴',
+    [EXCEL_HEADERS.MONTH]: 'مهرماه',
     [EXCEL_HEADERS.ABSENCES]: 4,
     [EXCEL_HEADERS.TARDIES]: 5,
     [EXCEL_HEADERS.DISCIPLINE]: 'نیاز به توجه',
@@ -62,6 +68,8 @@ export const SAMPLE_STUDENTS = [
   {
     [EXCEL_HEADERS.NAME]: 'سارا رحیمی',
     [EXCEL_HEADERS.CLASS]: 'هفتم ۲',
+    [EXCEL_HEADERS.YEAR]: 'سال تحصیلی ۱۴۰۵-۱۴۰۴',
+    [EXCEL_HEADERS.MONTH]: 'مهرماه',
     [EXCEL_HEADERS.ABSENCES]: 0,
     [EXCEL_HEADERS.TARDIES]: 1,
     [EXCEL_HEADERS.DISCIPLINE]: 'عالی',
@@ -76,6 +84,8 @@ export const SAMPLE_STUDENTS = [
   {
     [EXCEL_HEADERS.NAME]: 'امیررضا کریمی',
     [EXCEL_HEADERS.CLASS]: 'هفتم ۱',
+    [EXCEL_HEADERS.YEAR]: 'سال تحصیلی ۱۴۰۵-۱۴۰۴',
+    [EXCEL_HEADERS.MONTH]: 'مهرماه',
     [EXCEL_HEADERS.ABSENCES]: 2,
     [EXCEL_HEADERS.TARDIES]: 3,
     [EXCEL_HEADERS.DISCIPLINE]: 'خوب',
@@ -90,6 +100,8 @@ export const SAMPLE_STUDENTS = [
   {
     [EXCEL_HEADERS.NAME]: 'فاطمه نوری',
     [EXCEL_HEADERS.CLASS]: 'هفتم ۲',
+    [EXCEL_HEADERS.YEAR]: 'سال تحصیلی ۱۴۰۵-۱۴۰۴',
+    [EXCEL_HEADERS.MONTH]: 'مهرماه',
     [EXCEL_HEADERS.ABSENCES]: 1,
     [EXCEL_HEADERS.TARDIES]: 0,
     [EXCEL_HEADERS.DISCIPLINE]: 'عالی',
@@ -104,6 +116,8 @@ export const SAMPLE_STUDENTS = [
   {
     [EXCEL_HEADERS.NAME]: 'پارسا مرادی',
     [EXCEL_HEADERS.CLASS]: 'هفتم ۳',
+    [EXCEL_HEADERS.YEAR]: 'سال تحصیلی ۱۴۰۵-۱۴۰۴',
+    [EXCEL_HEADERS.MONTH]: 'مهرماه',
     [EXCEL_HEADERS.ABSENCES]: 6,
     [EXCEL_HEADERS.TARDIES]: 8,
     [EXCEL_HEADERS.DISCIPLINE]: 'ضعیف',
@@ -169,10 +183,31 @@ export const enrichStudentData = (rawStudent, index = 0) => {
   const currMath = Number(rawStudent[EXCEL_HEADERS.CURR_MATH]) || 0;
   const mathTrend = calculateTrend(currMath, prevMath);
 
+  const year = String(
+    rawStudent[EXCEL_HEADERS.YEAR] ||
+    rawStudent['سال'] ||
+    rawStudent['سال تحصیلی'] ||
+    rawStudent['Year'] ||
+    ''
+  ).trim();
+
+  const month = String(
+    rawStudent[EXCEL_HEADERS.MONTH] ||
+    rawStudent['ماه'] ||
+    rawStudent['ماه آزمون'] ||
+    rawStudent['دوره یا ماه'] ||
+    rawStudent['نوبت'] ||
+    rawStudent['دوره'] ||
+    rawStudent['Month'] ||
+    ''
+  ).trim();
+
   return {
     id: `student-${index + 1}`,
     name: String(rawStudent[EXCEL_HEADERS.NAME] || 'بدون نام').trim(),
     className: String(rawStudent[EXCEL_HEADERS.CLASS] || 'عمومی').trim(),
+    year,
+    month,
     absences: Number(rawStudent[EXCEL_HEADERS.ABSENCES]) || 0,
     tardies: Number(rawStudent[EXCEL_HEADERS.TARDIES]) || 0,
     discipline: String(rawStudent[EXCEL_HEADERS.DISCIPLINE] || 'خوب').trim(),
@@ -202,6 +237,8 @@ export const downloadExcelTemplate = () => {
   worksheet['!cols'] = [
     { wch: 22 }, // نام و نام خانوادگی
     { wch: 15 }, // کلاس
+    { wch: 18 }, // سال تحصیلی
+    { wch: 14 }, // ماه
     { wch: 12 }, // تعداد غیبت
     { wch: 12 }, // تعداد تاخیر
     { wch: 16 }, // وضعیت انضباط
@@ -256,6 +293,13 @@ export const parseExcelFile = (file) => {
             if (normRaw === normalizeKey(canonical)) {
               headerMap[rawKey] = canonical;
               break;
+            }
+          }
+          if (!headerMap[rawKey]) {
+            if (normRaw === 'سال' || normRaw === 'سال تحصیلی' || normRaw.toLowerCase() === 'year') {
+              headerMap[rawKey] = EXCEL_HEADERS.YEAR;
+            } else if (normRaw === 'ماه' || normRaw === 'ماه ازمون' || normRaw === 'نوبت' || normRaw === 'دوره' || normRaw.toLowerCase() === 'month') {
+              headerMap[rawKey] = EXCEL_HEADERS.MONTH;
             }
           }
         });

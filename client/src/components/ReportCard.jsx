@@ -44,6 +44,11 @@ export default function ReportCard({
 
   const disciplineStyle = getDisciplineStyle(student.discipline);
 
+  // Dynamic academic period from Excel month & year or grade config
+  const displayPeriod = (student.year && student.month)
+    ? `${student.year} • ${student.month}`
+    : (student.year || student.month || config.examPeriod || 'سال تحصیلی ۱۴۰۵-۱۴۰۴ • نوبت دوم');
+
   // Helper to render trend badge with Persian numbers
   const renderTrendBadge = (trend) => {
     let Icon = Minus;
@@ -264,7 +269,7 @@ export default function ReportCard({
             }}
           >
             <Typography variant="caption" sx={{ color: '#94A3B8', display: 'block', fontSize: '0.75rem', fontWeight: 600 }}>
-              {config.examPeriod || 'سال تحصیلی ۱۴۰۵-۱۴۰۴ • نوبت دوم'}
+              {displayPeriod}
             </Typography>
             <Stack direction="row" spacing={1.2} alignItems="center" sx={{ mt: 0.4 }}>
               <Typography variant="h6" sx={{ fontWeight: 900, color: '#0F172A', fontSize: '1.15rem' }}>
@@ -982,16 +987,13 @@ export default function ReportCard({
               }}
             >
               {/* Status & Verification Top Info */}
-              <Stack direction="row" justifyContent="space-between" alignItems="center">
+              <Stack direction="row" alignItems="center">
                 <Stack direction="row" spacing={0.8} alignItems="center">
                   <FileCheck size={16} color="#4F46E5" />
                   <Typography variant="caption" sx={{ fontWeight: 800, color: '#1E293B', fontSize: '0.8rem' }}>
                     تاییدیه رسمی شورای آموزشی مدرسه
                   </Typography>
                 </Stack>
-                <Typography variant="caption" sx={{ color: '#94A3B8', fontWeight: 600, fontSize: '0.74rem' }}>
-                  ثبت قطعی: مهرماه ۱۴۰۵
-                </Typography>
               </Stack>
 
               {/* Dual Designated Signature Zones - Two Squares Side-by-Side */}
@@ -1082,7 +1084,7 @@ export default function ReportCard({
         <Stack direction="row" justifyContent="space-between" alignItems="center">
           
           <Typography variant="caption" sx={{ color: '#94A3B8', fontSize: '0.75rem', fontWeight: 600 }}>
-            تاریخ صدور: مهرماه ۱۴۰۵ • صفحه ۱ از ۱
+            تاریخ صدور: {displayPeriod} • صفحه ۱ از ۱
           </Typography>
         </Stack>
       </Box>

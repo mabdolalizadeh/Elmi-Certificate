@@ -107,6 +107,11 @@ export function generatePdfHtml(students = [], visibility = {}, gradeConfigs = {
       const config = resolveConfigForStudent(student, gradeConfigs);
       const gradeName = detectGradeFromClassName(student.className);
 
+      // Dynamic academic period from Excel month & year or grade config
+      const displayPeriod = (student.year && student.month)
+        ? `${student.year} • ${student.month}`
+        : (student.year || student.month || config.examPeriod || 'سال تحصیلی ۱۴۰۵-۱۴۰۴ • نوبت دوم');
+
       // Homework gauge calculations
       const hwRate = Math.min(100, Math.max(0, student.homeworkRate || 0));
       const hwColor = hwRate >= 80 ? '#10B981' : hwRate >= 60 ? '#F59E0B' : '#F43F5E';
@@ -204,7 +209,7 @@ export function generatePdfHtml(students = [], visibility = {}, gradeConfigs = {
             </div>
 
             <div class="student-info">
-              <div class="report-meta">${config.examPeriod || 'سال تحصیلی ۱۴۰۵-۱۴۰۴ • نوبت دوم'}</div>
+              <div class="report-meta">${displayPeriod}</div>
               <div class="student-meta">
                 <span class="student-name">${student.name || 'دانش‌آموز'}</span>
                 <span class="class-badge">کلاس ${student.className || 'عمومی'}</span>
@@ -435,7 +440,6 @@ export function generatePdfHtml(students = [], visibility = {}, gradeConfigs = {
                     </svg>
                     <span>تاییدیه رسمی شورای آموزشی مدرسه</span>
                   </span>
-                  <span class="sig-status-date">ثبت قطعی: مهرماه ۱۴۰۵</span>
                 </div>
 
                 <!-- Two Square Signature Zones Side-by-Side -->
@@ -458,8 +462,6 @@ export function generatePdfHtml(students = [], visibility = {}, gradeConfigs = {
                     <div class="sig-line"></div>
                   </div>
                 </div>
-
-                <div class="sig-notice">کارنامه معتبر بدون نیاز به مهر فیزیکی دارای کد پیگیری یکپارچه است</div>
               </div>
             </div>
             `
@@ -470,7 +472,7 @@ export function generatePdfHtml(students = [], visibility = {}, gradeConfigs = {
 
           <!-- FOOTER -->
           <div class="card-footer">
-            <div>تاریخ صدور: مهرماه ۱۴۰۵ • صفحه ۱ از ۱</div>
+            <div>تاریخ صدور: ${displayPeriod} • صفحه ۱ از ۱</div>
           </div>
         </div>
       </div>
