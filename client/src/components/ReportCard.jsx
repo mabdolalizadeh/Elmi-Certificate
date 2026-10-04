@@ -47,8 +47,8 @@ export default function ReportCard({
 
   // Dynamic academic period from Excel month & year or grade config
   const displayPeriod = (student.year && student.month)
-    ? `${student.year} • ${student.month}`
-    : (student.year || student.month || config.examPeriod || 'سال تحصیلی ۱۴۰۵-۱۴۰۴ • نوبت دوم');
+    ? `گزارش عملکرد: ${student.month}‌ماه ${toPersianDigits(student.year)}`
+    : (student.year || student.month || config.examPeriod || 'گزارش عملکرد: آبان‌ماه ۱۴۰۳');
 
   // Helper to render trend badge with Persian numbers
   const renderTrendBadge = (trend) => {
@@ -269,7 +269,7 @@ export default function ReportCard({
               border: '1px solid #E2E8F0',
             }}
           >
-            <Typography variant="caption" sx={{ color: '#94A3B8', display: 'block', fontSize: '0.75rem', fontWeight: 600 }}>
+            <Typography variant="caption" sx={{ color: '#4F46E5', display: 'block', fontSize: '0.8rem', fontWeight: 800 }}>
               {displayPeriod}
             </Typography>
             <Stack direction="row" spacing={1.2} alignItems="center" sx={{ mt: 0.4 }}>
@@ -381,9 +381,13 @@ export default function ReportCard({
               <ComboBarLineChart
                 currScore={student.currTotal}
                 prevScore={student.prevTotal}
+                history={student.history}
+                metricType="total"
                 trend={student.overallTrend}
                 barColor="#4F46E5"
                 barGradient={['#3730A3', '#4F46E5']}
+                currentMonth={student.month}
+                currentYear={student.year}
                 height={125}
               />
             </Box>
@@ -425,9 +429,13 @@ export default function ReportCard({
               <ComboBarLineChart
                 currScore={student.currMath}
                 prevScore={student.prevMath}
+                history={student.history}
+                metricType="math"
                 trend={student.mathTrend}
                 barColor="#0284C7"
                 barGradient={['#0369A1', '#0EA5E9']}
+                currentMonth={student.month}
+                currentYear={student.year}
                 height={125}
               />
             </Box>

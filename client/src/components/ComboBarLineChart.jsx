@@ -1,49 +1,107 @@
 import React from 'react';
 import { Box, Typography, Stack } from '@mui/material';
-import { toPersianDigits } from '../utils/excelService';
+import { toPersianDigits, getMonthOrderIndex } from '../utils/excelService';
 
 /**
- * Hybrid Bar + Trend Line (Combo Chart)
- * Renders dual comparative bars (Previous vs Current) with an overlaid
- * monotone connecting trend line and circular node markers.
+ * Hybrid Bar + Trend Line (Combo Chart) with Multi-Exam Chronological Timeline
+ * 
+ * Timeline layout constraint:
+ * "The prev exams should be on lefter than new one. Last is the most right and first is the most left in chart."
+ * 
+ * - Checkpoint 0 (First / Oldest exam): Most Left (minX)
+ * - Checkpoint N-1 (Last / Current exam): Most Right (maxX)
+ * - Monotone line linking all points chronologically from left to right.
  */
 export default function ComboBarLineChart({
   currScore = 0,
   prevScore = 0,
+  history = [],
+  metricType = 'total', // 'total' | 'math'
   trend = {},
   barColor = '#4F46E5',
-  barGradient = ['#4338CA', '#4F46E5'],
+  barGradient = ['#3730A3', '#4F46E5'],
+  currentMonth = '',
+  currentYear = '',
   height = 135,
 }) {
   const safeCurr = Math.min(100, Math.max(0, Number(currScore) || 0));
   const safePrev = Math.min(100, Math.max(0, Number(prevScore) || 0));
-  const diff = safeCurr - safePrev;
 
-  // Trend line stroke color
+  // Build clean chronological points list
+  let points = [];
+
+  if (Array.isArray(history) && history.length >= 2) {
+    // Sort chronologically (earliest to latest)
+    const sorted = [...history].sort((a, b) => {
+      const yrA = String(a.year || '1403');
+      const yrB = String(b.year || '1403');
+      const yrComp = yrA.localeCompare(yrB);
+      if (yrComp !== 0) return yrComp;
+      return getMonthOrderIndex(a.month) - getMonthOrderIndex(b.month);
+    });
+
+    points = sorted.map((h, idx) => {
+      const rawVal = metricType === 'math' ? h.math : h.total;
+      const score = Math.min(100, Math.max(0, Number(rawVal) || 0));
+      return {
+        label: String(h.month || `آزمون ${toPersianDigits(idx + 1)}`).replace('ماه', ''),
+        year: h.year,
+        score,
+        isLatest: idx === sorted.length - 1,
+      };
+    });
+  } else {
+    // 2-point fallback: Previous (left) -> Current (right)
+    points = [
+      {
+        label: 'دوره قبل',
+        score: safePrev,
+        isLatest: false,
+      },
+      {
+        label: currentMonth ? String(currentMonth).replace('ماه', '') : 'فعلی',
+        score: safeCurr,
+        isLatest: true,
+      },
+    ];
+  }
+
+  const N = points.length;
+  const diff = safeCurr - safePrev;
   const trendLineColor =
     diff > 2 ? '#10B981' : diff < -2 ? '#F43F5E' : '#64748B';
 
   // SVG Coordinate mapping (ViewBox: 0 0 320 135)
-  // Baseline at y = 104, Top max (100%) at y = 22 => Chart height = 82px
-  const baselineY = 104;
-  const maxBarH = 78;
+  // Baseline at y = 102, Top max (100%) at y = 24 => Chart height = 78px
+  const baselineY = 102;
+  const maxBarH = 76;
 
-  const prevBarH = (safePrev / 100) * maxBarH;
-  const prevY = baselineY - prevBarH;
+  // Horizontal distribution:
+  // First exam is at minX (Leftmost), Last exam is at maxX (Rightmost)
+  const minX = N >= 4 ? 65 : N === 3 ? 75 : 95;
+  const maxX = N >= 4 ? 275 : N === 3 ? 260 : 235;
+  const barWidth = N >= 4 ? 28 : N === 3 ? 36 : 44;
 
-  const currBarH = (safeCurr / 100) * maxBarH;
-  const currY = baselineY - currBarH;
+  const renderedPoints = points.map((p, idx) => {
+    const x = N === 1 ? (minX + maxX) / 2 : minX + (idx / (N - 1)) * (maxX - minX);
+    const barH = (p.score / 100) * maxBarH;
+    const y = baselineY - barH;
+    return { ...p, x, y, barH };
+  });
 
-  // Bar centers (RTL layout: Previous on right, Current on left)
-  const prevX = 215;
-  const currX = 95;
-  const barWidth = 44;
+  // Build connecting curve path from Left (first) to Right (last)
+  let pathD = '';
+  if (renderedPoints.length >= 2) {
+    pathD = `M ${renderedPoints[0].x} ${renderedPoints[0].y}`;
+    for (let i = 0; i < renderedPoints.length - 1; i++) {
+      const p0 = renderedPoints[i];
+      const p1 = renderedPoints[i + 1];
+      const midX = (p0.x + p1.x) / 2;
+      pathD += ` C ${midX} ${p0.y}, ${midX} ${p1.y}, ${p1.x} ${p1.y}`;
+    }
+  }
 
-  // Monotone bezier curve control points
-  const midX = (prevX + currX) / 2;
-  const pathD = `M ${prevX} ${prevY} C ${midX} ${prevY}, ${midX} ${currY}, ${currX} ${currY}`;
-
-  const gradId = `comboGrad_${barColor.replace('#', '')}`;
+  const gradId = `comboGrad_${metricType}_${barColor.replace('#', '')}`;
 
   return (
     <Box sx={{ width: '100%', position: 'relative', my: 0.5 }}>
@@ -61,7 +119,7 @@ export default function ComboBarLineChart({
             <stop offset="0%" stopColor={barGradient[1]} />
             <stop offset="100%" stopColor={barGradient[0]} />
           </linearGradient>
-          <linearGradient id="prevGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <linearGradient id="historyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
             <stop offset="0%" stopColor="#94A3B8" />
             <stop offset="100%" stopColor="#64748B" />
           </linearGradient>
@@ -78,14 +136,14 @@ export default function ComboBarLineChart({
               <line
                 x1="45"
                 y1={yPos}
-                x2="275"
+                x2="285"
                 y2={yPos}
                 stroke={level === 0 ? '#CBD5E1' : '#E2E8F0'}
                 strokeWidth={level === 0 ? '1.5' : '1'}
                 strokeDasharray={level === 0 ? 'none' : '3 3'}
               />
               <text
-                x="35"
+                x="36"
                 y={yPos + 3.5}
                 textAnchor="end"
                 fill="#94A3B8"
@@ -99,108 +157,72 @@ export default function ComboBarLineChart({
           );
         })}
 
-        {/* Bar 1: Previous Exam (آزمون قبلی) */}
-        <rect
-          x={prevX - barWidth / 2}
-          y={prevY}
-          width={barWidth}
-          height={prevBarH}
-          rx={5}
-          fill="url(#prevGrad)"
-          opacity={0.88}
-        />
+        {/* Render Bars Chronologically: Left (Previous) to Right (Last) */}
+        {renderedPoints.map((pt, idx) => {
+          return (
+            <rect
+              key={`bar-${idx}`}
+              x={pt.x - barWidth / 2}
+              y={pt.y}
+              width={barWidth}
+              height={pt.barH}
+              rx={5}
+              fill={pt.isLatest ? `url(#${gradId})` : 'url(#historyGrad)'}
+              opacity={pt.isLatest ? 1 : 0.82}
+            />
+          );
+        })}
 
-        {/* Bar 2: Current Exam (آزمون فعلی) */}
-        <rect
-          x={currX - barWidth / 2}
-          y={currY}
-          width={barWidth}
-          height={currBarH}
-          rx={5}
-          fill={`url(#${gradId})`}
-        />
+        {/* Overlaid Connecting Trend Line (Left -> Right) */}
+        {pathD && (
+          <path
+            d={pathD}
+            fill="none"
+            stroke={trendLineColor}
+            strokeWidth="3"
+            strokeLinecap="round"
+          />
+        )}
 
-        {/* Overlaid Monotone Connecting Trend Line */}
-        <path
-          d={pathD}
-          fill="none"
-          stroke={trendLineColor}
-          strokeWidth="3"
-          strokeLinecap="round"
-          strokeDasharray="none"
-        />
-
-        {/* Node Circle 1 (Previous Score) */}
-        <circle
-          cx={prevX}
-          cy={prevY}
-          r="5"
-          fill="#FFFFFF"
-          stroke="#64748B"
-          strokeWidth="2.5"
-          filter="url(#nodeShadow)"
-        />
-
-        {/* Node Circle 2 (Current Score) */}
-        <circle
-          cx={currX}
-          cy={currY}
-          r="5.5"
-          fill="#FFFFFF"
-          stroke={trendLineColor}
-          strokeWidth="3"
-          filter="url(#nodeShadow)"
-        />
-
-        {/* Score Value Labels on Top of Bars */}
-        <text
-          x={prevX}
-          y={Math.max(14, prevY - 7)}
-          textAnchor="middle"
-          fill="#475569"
-          fontSize="11.5"
-          fontWeight="800"
-          fontFamily="Vazirmatn, sans-serif"
-        >
-          ٪{toPersianDigits(safePrev)}
-        </text>
-
-        <text
-          x={currX}
-          y={Math.max(14, currY - 7)}
-          textAnchor="middle"
-          fill={barColor}
-          fontSize="12.5"
-          fontWeight="900"
-          fontFamily="Vazirmatn, sans-serif"
-        >
-          ٪{toPersianDigits(safeCurr)}
-        </text>
-
-        {/* X-Axis Category Labels */}
-        <text
-          x={prevX}
-          y={122}
-          textAnchor="middle"
-          fill="#64748B"
-          fontSize="10"
-          fontWeight="700"
-          fontFamily="Vazirmatn, sans-serif"
-        >
-          آزمون قبلی
-        </text>
-
-        <text
-          x={currX}
-          y={122}
-          textAnchor="middle"
-          fill="#1E293B"
-          fontSize="10.5"
-          fontWeight="800"
-          fontFamily="Vazirmatn, sans-serif"
-        >
-          آزمون فعلی
-        </text>
+        {/* Node Circles & Score Values */}
+        {renderedPoints.map((pt, idx) => {
+          return (
+            <g key={`pt-${idx}`}>
+              <circle
+                cx={pt.x}
+                cy={pt.y}
+                r={pt.isLatest ? 5.5 : 4.5}
+                fill="#FFFFFF"
+                stroke={pt.isLatest ? trendLineColor : '#64748B'}
+                strokeWidth={pt.isLatest ? 3 : 2.5}
+                filter="url(#nodeShadow)"
+              />
+              <text
+                x={pt.x}
+                y={Math.max(14, pt.y - 7)}
+                textAnchor="middle"
+                fill={pt.isLatest ? barColor : '#475569'}
+                fontSize={pt.isLatest ? '12' : '10.5'}
+                fontWeight={pt.isLatest ? '900' : '800'}
+                fontFamily="Vazirmatn, sans-serif"
+              >
+                ٪{toPersianDigits(pt.score)}
+              </text>
+              {/* Timeline Tick Month Label on X-Axis */}
+              <text
+                x={pt.x}
+                y={122}
+                textAnchor="middle"
+                fill={pt.isLatest ? '#1E293B' : '#64748B'}
+                fontSize={pt.isLatest ? '10.5' : '9.5'}
+                fontWeight={pt.isLatest ? '900' : '700'}
+                fontFamily="Vazirmatn, sans-serif"
+              >
+                {pt.label}
+              </text>
+            </g>
+          );
+        })}
       </svg>
 
       {/* Legend & Trend Indicator Strip */}
@@ -217,14 +239,14 @@ export default function ComboBarLineChart({
         <Stack direction="row" spacing={1.5} alignItems="center">
           <Stack direction="row" spacing={0.6} alignItems="center">
             <Box sx={{ width: 10, height: 10, bgcolor: barColor, borderRadius: 0.5 }} />
-            <Typography variant="caption" sx={{ color: '#1E293B', fontSize: '0.72rem', fontWeight: 700 }}>
-              فعلی
+            <Typography variant="caption" sx={{ color: '#1E293B', fontSize: '0.72rem', fontWeight: 800 }}>
+              {currentMonth ? `آزمون ${currentMonth}` : 'فعلی (راست)'}
             </Typography>
           </Stack>
           <Stack direction="row" spacing={0.6} alignItems="center">
             <Box sx={{ width: 10, height: 10, bgcolor: '#94A3B8', borderRadius: 0.5 }} />
             <Typography variant="caption" sx={{ color: '#64748B', fontSize: '0.72rem', fontWeight: 600 }}>
-              قبلی
+              سوابق قبلی (چپ)
             </Typography>
           </Stack>
         </Stack>
@@ -246,7 +268,7 @@ export default function ComboBarLineChart({
               fontWeight: 800,
             }}
           >
-            خط سیر رشد
+            سیر رشد ({diff > 0 ? `+${toPersianDigits(diff)}` : toPersianDigits(diff)}٪)
           </Typography>
         </Stack>
       </Stack>

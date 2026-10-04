@@ -100,32 +100,84 @@ export function generatePdfHtml(students = [], visibility = {}, gradeConfigs = {
     `;
   };
 
-  const renderComboChartSvg = (currScore = 0, prevScore = 0, barColor = '#4F46E5', barGradient = ['#3730A3', '#4F46E5'], chartId = 'c1') => {
+  const renderComboChartSvg = (
+    currScore = 0,
+    prevScore = 0,
+    barColor = '#4F46E5',
+    barGradient = ['#3730A3', '#4F46E5'],
+    chartId = 'c1',
+    history = [],
+    metricType = 'total',
+    currentMonth = ''
+  ) => {
     const safeCurr = Math.min(100, Math.max(0, Number(currScore) || 0));
     const safePrev = Math.min(100, Math.max(0, Number(prevScore) || 0));
+
+    let points = [];
+    if (Array.isArray(history) && history.length >= 2) {
+      points = history.map((h, idx) => {
+        const rawVal = metricType === 'math' ? h.math : h.total;
+        const score = Math.min(100, Math.max(0, Number(rawVal) || 0));
+        return {
+          label: String(h.month || `آزمون ${toPersianDigits(idx + 1)}`).replace('ماه', ''),
+          score,
+          isLatest: idx === history.length - 1,
+        };
+      });
+    } else {
+      points = [
+        { label: 'دوره قبل', score: safePrev, isLatest: false },
+        { label: currentMonth ? String(currentMonth).replace('ماه', '') : 'فعلی', score: safeCurr, isLatest: true },
+      ];
+    }
+
+    const N = points.length;
     const diff = safeCurr - safePrev;
     const trendLineColor = diff > 2 ? '#10B981' : diff < -2 ? '#F43F5E' : '#64748B';
 
     const baselineY = 90;
     const maxBarH = 68;
-    const prevBarH = (safePrev / 100) * maxBarH;
-    const prevY = baselineY - prevBarH;
-    const currBarH = (safeCurr / 100) * maxBarH;
-    const currY = baselineY - currBarH;
 
-    const prevX = 215;
-    const currX = 95;
-    const barWidth = 42;
-    const midX = (prevX + currX) / 2;
-    const pathD = `M ${prevX} ${prevY} C ${midX} ${prevY}, ${midX} ${currY}, ${currX} ${currY}`;
+    // Timeline constraint: prev on left (minX), current on right (maxX)
+    const minX = N >= 4 ? 65 : N === 3 ? 75 : 95;
+    const maxX = N >= 4 ? 265 : N === 3 ? 255 : 225;
+    const barWidth = N >= 4 ? 26 : N === 3 ? 34 : 40;
+
+    const renderedPoints = points.map((p, idx) => {
+      const x = N === 1 ? (minX + maxX) / 2 : minX + (idx / (N - 1)) * (maxX - minX);
+      const barH = (p.score / 100) * maxBarH;
+      const y = baselineY - barH;
+      return { ...p, x, y, barH };
+    });
+
+    let pathD = '';
+    if (renderedPoints.length >= 2) {
+      pathD = `M ${renderedPoints[0].x} ${renderedPoints[0].y}`;
+      for (let i = 0; i < renderedPoints.length - 1; i++) {
+        const p0 = renderedPoints[i];
+        const p1 = renderedPoints[i + 1];
+        const midX = (p0.x + p1.x) / 2;
+        pathD += ` C ${midX} ${p0.y}, ${midX} ${p1.y}, ${p1.x} ${p1.y}`;
+      }
+    }
 
     const gridLines = [0, 25, 50, 75, 100].map(level => {
       const yPos = baselineY - (level / 100) * maxBarH;
       return `
-        <line x1="45" y1="${yPos}" x2="275" y2="${yPos}" stroke="${level === 0 ? '#CBD5E1' : '#E2E8F0'}" stroke-width="${level === 0 ? '1.5' : '1'}" stroke-dasharray="${level === 0 ? 'none' : '3 3'}" />
+        <line x1="45" y1="${yPos}" x2="280" y2="${yPos}" stroke="${level === 0 ? '#CBD5E1' : '#E2E8F0'}" stroke-width="${level === 0 ? '1.5' : '1'}" stroke-dasharray="${level === 0 ? 'none' : '3 3'}" />
         <text x="35" y="${yPos + 3.5}" text-anchor="end" fill="#94A3B8" font-size="8.5" font-weight="600" font-family="Vazirmatn, sans-serif">${toPersianDigits(level)}</text>
       `;
     }).join('');
+
+    const barsMarkup = renderedPoints.map((pt, idx) => `
+      <rect x="${pt.x - barWidth / 2}" y="${pt.y}" width="${barWidth}" height="${pt.barH}" rx="5" fill="${pt.isLatest ? `url(#grad_${chartId})` : `url(#prevGrad_${chartId})`}" opacity="${pt.isLatest ? '1' : '0.85'}" />
+    `).join('');
+
+    const nodesMarkup = renderedPoints.map(pt => `
+      <circle cx="${pt.x}" cy="${pt.y}" r="${pt.isLatest ? 5 : 4}" fill="#FFFFFF" stroke="${pt.isLatest ? trendLineColor : '#64748B'}" stroke-width="${pt.isLatest ? 2.8 : 2.2}" />
+      <text x="${pt.x}" y="${Math.max(12, pt.y - 6)}" text-anchor="middle" fill="${pt.isLatest ? barColor : '#475569'}" font-size="${pt.isLatest ? 12 : 10.5}" font-weight="${pt.isLatest ? 900 : 800}" font-family="Vazirmatn, sans-serif">٪${toPersianDigits(pt.score)}</text>
+      <text x="${pt.x}" y="110" text-anchor="middle" fill="${pt.isLatest ? '#1E293B' : '#64748B'}" font-size="${pt.isLatest ? 10 : 9}" font-weight="${pt.isLatest ? 800 : 700}" font-family="Vazirmatn, sans-serif">${pt.label}</text>
+    `).join('');
 
     return `
       <div style="width:100%; margin-top: 2px;">
@@ -142,36 +194,18 @@ export function generatePdfHtml(students = [], visibility = {}, gradeConfigs = {
           </defs>
 
           ${gridLines}
-
-          <!-- Previous Bar -->
-          <rect x="${prevX - barWidth / 2}" y="${prevY}" width="${barWidth}" height="${prevBarH}" rx="5" fill="url(#prevGrad_${chartId})" opacity="0.88" />
-
-          <!-- Current Bar -->
-          <rect x="${currX - barWidth / 2}" y="${currY}" width="${barWidth}" height="${currBarH}" rx="5" fill="url(#grad_${chartId})" />
-
-          <!-- Connecting Monotone Line -->
-          <path d="${pathD}" fill="none" stroke="${trendLineColor}" stroke-width="2.8" stroke-linecap="round" />
-
-          <!-- Node Circles -->
-          <circle cx="${prevX}" cy="${prevY}" r="4.5" fill="#FFFFFF" stroke="#64748B" stroke-width="2.5" />
-          <circle cx="${currX}" cy="${currY}" r="5" fill="#FFFFFF" stroke="${trendLineColor}" stroke-width="2.8" />
-
-          <!-- Score Labels Top -->
-          <text x="${prevX}" y="${Math.max(12, prevY - 6)}" text-anchor="middle" fill="#475569" font-size="11" font-weight="800" font-family="Vazirmatn, sans-serif">٪${toPersianDigits(safePrev)}</text>
-          <text x="${currX}" y="${Math.max(12, currY - 6)}" text-anchor="middle" fill="${barColor}" font-size="12" font-weight="900" font-family="Vazirmatn, sans-serif">٪${toPersianDigits(safeCurr)}</text>
-
-          <!-- Category Labels Bottom -->
-          <text x="${prevX}" y="110" text-anchor="middle" fill="#64748B" font-size="9.5" font-weight="700" font-family="Vazirmatn, sans-serif">آزمون قبلی</text>
-          <text x="${currX}" y="110" text-anchor="middle" fill="#1E293B" font-size="10" font-weight="800" font-family="Vazirmatn, sans-serif">آزمون فعلی</text>
+          ${barsMarkup}
+          ${pathD ? `<path d="${pathD}" fill="none" stroke="${trendLineColor}" stroke-width="2.8" stroke-linecap="round" />` : ''}
+          ${nodesMarkup}
         </svg>
 
         <div style="display:flex; justify-content:space-between; align-items:center; padding: 3px 6px 0 6px; border-top: 1px solid #F1F5F9; font-size:9.5px; font-weight:700;">
           <div style="display:flex; gap:10px; align-items:center;">
-            <span style="display:inline-flex; align-items:center; gap:4px; color:#1E293B;"><span style="width:8px; height:8px; background:${barColor}; border-radius:2px; display:inline-block;"></span>فعلی</span>
-            <span style="display:inline-flex; align-items:center; gap:4px; color:#64748B;"><span style="width:8px; height:8px; background:#94A3B8; border-radius:2px; display:inline-block;"></span>قبلی</span>
+            <span style="display:inline-flex; align-items:center; gap:4px; color:#1E293B;"><span style="width:8px; height:8px; background:${barColor}; border-radius:2px; display:inline-block;"></span>فعلی (راست)</span>
+            <span style="display:inline-flex; align-items:center; gap:4px; color:#64748B;"><span style="width:8px; height:8px; background:#94A3B8; border-radius:2px; display:inline-block;"></span>قبلی (چپ)</span>
           </div>
           <div style="display:flex; align-items:center; gap:4px; color:${trendLineColor}; font-weight:800;">
-            <span style="width:12px; height:2.5px; background:${trendLineColor}; border-radius:2px; display:inline-block;"></span>خط سیر رشد
+            <span style="width:12px; height:2.5px; background:${trendLineColor}; border-radius:2px; display:inline-block;"></span>سیر رشد (${diff > 0 ? `+${toPersianDigits(diff)}` : toPersianDigits(diff)}٪)
           </div>
         </div>
       </div>
@@ -187,8 +221,8 @@ export function generatePdfHtml(students = [], visibility = {}, gradeConfigs = {
 
       // Dynamic academic period from Excel month & year or grade config
       const displayPeriod = (student.year && student.month)
-        ? `${student.year} • ${student.month}`
-        : (student.year || student.month || config.examPeriod || 'سال تحصیلی ۱۴۰۵-۱۴۰۴ • نوبت دوم');
+        ? `گزارش عملکرد: ${student.month}‌ماه ${toPersianDigits(student.year)}`
+        : (student.year || student.month || config.examPeriod || 'گزارش عملکرد: آبان‌ماه ۱۴۰۳');
 
       // Homework gauge calculations
       const hwRate = Math.min(100, Math.max(0, student.homeworkRate || 0));
@@ -323,7 +357,7 @@ export function generatePdfHtml(students = [], visibility = {}, gradeConfigs = {
                   <span class="curr-score" style="color:#4F46E5;">٪${toPersianDigits(student.currTotal)}</span>
                   <span class="prev-score">دوره قبلی: ٪${toPersianDigits(student.prevTotal)}</span>
                 </div>
-                ${renderComboChartSvg(student.currTotal, student.prevTotal, '#4F46E5', ['#3730A3', '#4F46E5'], 'tot_' + idx)}
+                ${renderComboChartSvg(student.currTotal, student.prevTotal, '#4F46E5', ['#3730A3', '#4F46E5'], 'tot_' + idx, student.history, 'total', student.month)}
               </div>
 
               <!-- Math Score Combo Card -->
@@ -336,7 +370,7 @@ export function generatePdfHtml(students = [], visibility = {}, gradeConfigs = {
                   <span class="curr-score" style="color:#0284C7;">٪${toPersianDigits(student.currMath)}</span>
                   <span class="prev-score">دوره قبلی: ٪${toPersianDigits(student.prevMath)}</span>
                 </div>
-                ${renderComboChartSvg(student.currMath, student.prevMath, '#0284C7', ['#0369A1', '#0EA5E9'], 'mth_' + idx)}
+                ${renderComboChartSvg(student.currMath, student.prevMath, '#0284C7', ['#0369A1', '#0EA5E9'], 'mth_' + idx, student.history, 'math', student.month)}
               </div>
             </div>
             `
