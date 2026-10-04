@@ -492,155 +492,317 @@ export default function ReportCard({
           </Box>
         )}
 
-        {/* ================= CENTER COLUMN: BEHAVIORAL & ATTENDANCE ================= */}
+        {/* ================= CENTER COLUMN: BEHAVIORAL, ATTENDANCE & RADIAL HOMEWORK GAUGE ================= */}
         <Box
           sx={{
             bgcolor: '#F8FAFC',
             borderRadius: 3.5,
-            p: 2.2,
+            p: 2.4,
             border: '1px solid #E2E8F0',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
+            gap: 2,
           }}
         >
-          <Stack direction="row" alignItems="center" spacing={1.2} sx={{ mb: 1.8 }}>
-            <Box sx={{ p: 0.8, borderRadius: 2, bgcolor: '#ECFDF5', color: '#059669' }}>
-              <ShieldCheck size={18} />
+          {/* Header */}
+          <Stack direction="row" alignItems="center" spacing={1.2}>
+            <Box
+              sx={{
+                p: 0.9,
+                borderRadius: 2.2,
+                bgcolor: '#ECFDF5',
+                color: '#059669',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <ShieldCheck size={20} />
             </Box>
-            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#1E293B', fontSize: '0.92rem' }}>
-              انضباط، تکالیف و حضور و غیاب
-            </Typography>
+            <Box>
+              <Typography variant="subtitle2" sx={{ fontWeight: 900, color: '#1E293B', fontSize: '0.98rem' }}>
+                انضباط، تکالیف و شاخص‌های حضور
+              </Typography>
+              <Typography variant="caption" sx={{ color: '#64748B', fontSize: '0.74rem' }}>
+                سنجش رفتاری و پیگیری هفتگی دانش‌آموز
+              </Typography>
+            </Box>
           </Stack>
 
-          {/* Attendance Cards */}
+          {/* Attendance Metrics */}
           {visibility.attendance && (
-            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1.5, mb: 1.8 }}>
+            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1.5 }}>
+              {/* Absences Card */}
               <Box
                 sx={{
                   bgcolor: '#FFFFFF',
                   borderRadius: 3,
-                  p: 1.6,
-                  textAlign: 'center',
-                  border: '1px solid #E2E8F0',
-                  boxShadow: '0 2px 8px rgba(15, 23, 42, 0.02)',
+                  p: 1.8,
+                  border: '1.5px solid #FEE2E2',
+                  boxShadow: '0 4px 12px rgba(239, 68, 68, 0.04)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1.5,
                 }}
               >
-                <Stack direction="row" justifyContent="center" alignItems="center" spacing={0.6} sx={{ mb: 0.6 }}>
-                  <CalendarX2 size={16} color="#DC2626" />
-                  <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 700 }}>
-                    غیبت‌ها
+                <Box
+                  sx={{
+                    width: 42,
+                    height: 42,
+                    borderRadius: 2.5,
+                    bgcolor: '#FEF2F2',
+                    color: '#DC2626',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    border: '1px solid #FECACA',
+                  }}
+                >
+                  <CalendarX2 size={20} />
+                </Box>
+                <Box>
+                  <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 700, display: 'block' }}>
+                    میزان غیبت‌ها
                   </Typography>
-                </Stack>
-                <Typography variant="h5" sx={{ fontWeight: 900, color: '#1E293B', fontSize: '1.4rem' }}>
-                  {toPersianDigits(student.absences)}
-                  <Typography component="span" variant="caption" sx={{ color: '#94A3B8', mr: 0.6, fontSize: '0.8rem' }}>
-                    روز
+                  <Typography variant="h5" sx={{ fontWeight: 900, color: '#1E293B', fontSize: '1.35rem', lineHeight: 1.1 }}>
+                    {toPersianDigits(student.absences)}
+                    <Typography component="span" variant="caption" sx={{ color: '#94A3B8', mr: 0.6, fontSize: '0.78rem', fontWeight: 600 }}>
+                      روز
+                    </Typography>
                   </Typography>
-                </Typography>
+                </Box>
               </Box>
 
+              {/* Tardies Card */}
               <Box
                 sx={{
                   bgcolor: '#FFFFFF',
                   borderRadius: 3,
-                  p: 1.6,
-                  textAlign: 'center',
-                  border: '1px solid #E2E8F0',
-                  boxShadow: '0 2px 8px rgba(15, 23, 42, 0.02)',
+                  p: 1.8,
+                  border: '1.5px solid #FEF3C7',
+                  boxShadow: '0 4px 12px rgba(245, 158, 11, 0.04)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1.5,
                 }}
               >
-                <Stack direction="row" justifyContent="center" alignItems="center" spacing={0.6} sx={{ mb: 0.6 }}>
-                  <Clock size={16} color="#D97706" />
-                  <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 700 }}>
-                    تاخیرها
+                <Box
+                  sx={{
+                    width: 42,
+                    height: 42,
+                    borderRadius: 2.5,
+                    bgcolor: '#FFFBEB',
+                    color: '#D97706',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    border: '1px solid #FDE68A',
+                  }}
+                >
+                  <Clock size={20} />
+                </Box>
+                <Box>
+                  <Typography variant="caption" sx={{ color: '#64748B', fontWeight: 700, display: 'block' }}>
+                    تعداد تاخیرها
                   </Typography>
-                </Stack>
-                <Typography variant="h5" sx={{ fontWeight: 900, color: '#1E293B', fontSize: '1.4rem' }}>
-                  {toPersianDigits(student.tardies)}
-                  <Typography component="span" variant="caption" sx={{ color: '#94A3B8', mr: 0.6, fontSize: '0.8rem' }}>
-                    مورد
+                  <Typography variant="h5" sx={{ fontWeight: 900, color: '#1E293B', fontSize: '1.35rem', lineHeight: 1.1 }}>
+                    {toPersianDigits(student.tardies)}
+                    <Typography component="span" variant="caption" sx={{ color: '#94A3B8', mr: 0.6, fontSize: '0.78rem', fontWeight: 600 }}>
+                      مورد
+                    </Typography>
                   </Typography>
-                </Typography>
+                </Box>
               </Box>
             </Box>
           )}
 
-          {/* Discipline Status */}
-          {visibility.discipline && (
-            <Box
-              sx={{
-                bgcolor: '#FFFFFF',
-                borderRadius: 3,
-                p: 1.8,
-                border: '1px solid #E2E8F0',
-                boxShadow: '0 2px 8px rgba(15, 23, 42, 0.02)',
-                mb: 1.8,
-              }}
-            >
-              <Typography variant="caption" sx={{ color: '#64748B', display: 'block', mb: 0.8, fontWeight: 700 }}>
-                ارزیابی انضباط و رفتار کلاسی
-              </Typography>
+          {/* 4-Segment Qualitative Discipline Meter */}
+          {visibility.discipline && (() => {
+            const levels = [
+              { key: 'ضعیف', label: 'ضعیف', lvl: 1, activeColor: '#EF4444', activeBg: '#FEE2E2', activeBorder: '#FCA5A5' },
+              { key: 'نیاز به توجه', label: 'نیاز به توجه', lvl: 2, activeColor: '#F59E0B', activeBg: '#FEF3C7', activeBorder: '#FCD34D' },
+              { key: 'خوب', label: 'خوب', lvl: 3, activeColor: '#3B82F6', activeBg: '#DBEAFE', activeBorder: '#93C5FD' },
+              { key: 'عالی', label: 'عالی', lvl: 4, activeColor: '#10B981', activeBg: '#D1FAE5', activeBorder: '#6EE7B7' },
+            ];
+
+            const currentLevelMap = {
+              'ضعیف': 1,
+              'نیاز به توجه': 2,
+              'خوب': 3,
+              'عالی': 4,
+            };
+            const studentLvl = currentLevelMap[student.discipline] || 3;
+
+            return (
               <Box
                 sx={{
-                  bgcolor: disciplineStyle.bg,
-                  color: disciplineStyle.color,
-                  border: `1.5px solid ${disciplineStyle.border}`,
-                  py: 1,
-                  px: 1.5,
-                  borderRadius: 2.5,
-                  textAlign: 'center',
-                  fontWeight: 900,
-                  fontSize: '0.96rem',
+                  bgcolor: '#FFFFFF',
+                  borderRadius: 3,
+                  p: 2,
+                  border: '1.5px solid #E2E8F0',
+                  boxShadow: '0 4px 14px rgba(15, 23, 42, 0.03)',
                 }}
               >
-                وضعیت: {disciplineStyle.label}
-              </Box>
-            </Box>
-          )}
+                <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.4 }}>
+                  <Typography variant="body2" sx={{ fontWeight: 800, color: '#1E293B', fontSize: '0.86rem' }}>
+                    درجه‌بندی انضباط کلاسی
+                  </Typography>
+                  <Chip
+                    label={`رتبه فعلی: ${student.discipline}`}
+                    size="small"
+                    sx={{
+                      bgcolor: disciplineStyle.bg,
+                      color: disciplineStyle.color,
+                      fontWeight: 800,
+                      fontSize: '0.78rem',
+                      border: `1px solid ${disciplineStyle.border}`,
+                    }}
+                  />
+                </Stack>
 
-          {/* Homework Delivery Rate */}
-          {visibility.homework && (
-            <Box
-              sx={{
-                bgcolor: '#FFFFFF',
-                borderRadius: 3,
-                p: 1.8,
-                border: '1px solid #E2E8F0',
-                boxShadow: '0 2px 8px rgba(15, 23, 42, 0.02)',
-              }}
-            >
-              <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
-                <Stack direction="row" spacing={0.8} alignItems="center">
-                  <CheckSquare size={16} color="#4F46E5" />
-                  <Typography variant="caption" sx={{ fontWeight: 800, color: '#334155' }}>
-                    نرخ تحویل تکالیف
+                {/* 4 Qualitative Segmented Pills */}
+                <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 0.8 }}>
+                  {levels.map((seg) => {
+                    const isLit = seg.lvl <= studentLvl;
+                    const isCurrent = seg.lvl === studentLvl;
+
+                    return (
+                      <Box
+                        key={seg.key}
+                        sx={{
+                          py: 1,
+                          px: 0.5,
+                          borderRadius: 2,
+                          textAlign: 'center',
+                          transition: 'all 0.3s ease',
+                          bgcolor: isCurrent ? seg.activeColor : isLit ? seg.activeBg : '#F1F5F9',
+                          color: isCurrent ? '#FFFFFF' : isLit ? seg.activeColor : '#94A3B8',
+                          border: isCurrent
+                            ? `1.5px solid ${seg.activeColor}`
+                            : isLit
+                            ? `1.5px solid ${seg.activeBorder}`
+                            : '1.5px solid #E2E8F0',
+                          boxShadow: isCurrent ? `0 4px 12px ${seg.activeColor}40` : 'none',
+                        }}
+                      >
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            display: 'block',
+                            fontWeight: isCurrent ? 900 : 700,
+                            fontSize: '0.75rem',
+                          }}
+                        >
+                          {seg.label}
+                        </Typography>
+                      </Box>
+                    );
+                  })}
+                </Box>
+              </Box>
+            );
+          })()}
+
+          {/* Semi-Donut / Radial Speedometer Homework Gauge */}
+          {visibility.homework && (() => {
+            const rate = student.homeworkRate;
+            const gaugeColor = rate >= 80 ? '#10B981' : rate >= 60 ? '#F59E0B' : '#F43F5E';
+            const gaugeColorEnd = rate >= 80 ? '#059669' : rate >= 60 ? '#D97706' : '#DC2626';
+
+            // Arch circumference for R=54 is ~169.65
+            const archLength = 169.65;
+            const strokeOffset = archLength - (archLength * Math.min(100, Math.max(0, rate))) / 100;
+
+            return (
+              <Box
+                sx={{
+                  bgcolor: '#FFFFFF',
+                  borderRadius: 3,
+                  p: 2,
+                  border: '1.5px solid #E2E8F0',
+                  boxShadow: '0 4px 14px rgba(15, 23, 42, 0.03)',
+                  flex: 1,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}
+              >
+                <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ width: '100%', mb: 0.5 }}>
+                  <Typography variant="body2" sx={{ fontWeight: 800, color: '#1E293B', fontSize: '0.86rem' }}>
+                    شاخص تحویل تکالیف آموزشی
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: gaugeColor, fontWeight: 800, fontSize: '0.8rem' }}>
+                    {rate >= 80 ? 'بسیار مطلوب' : rate >= 60 ? 'متوسط' : 'نیاز به پیگیری'}
                   </Typography>
                 </Stack>
-                <Typography variant="caption" sx={{ fontWeight: 900, color: '#4F46E5', fontSize: '0.88rem' }}>
-                  {toPersianDigits(student.homeworkSubmitted)} از {toPersianDigits(student.homeworkTotal)} (٪{toPersianDigits(student.homeworkRate)})
-                </Typography>
-              </Stack>
-              <LinearProgress
-                variant="determinate"
-                value={student.homeworkRate}
-                sx={{
-                  height: 10,
-                  borderRadius: 5,
-                  bgcolor: '#EEF2FF',
-                  '& .MuiLinearProgress-bar': {
-                    background:
-                      student.homeworkRate >= 80
-                        ? 'linear-gradient(90deg, #10B981, #059669)'
-                        : student.homeworkRate >= 60
-                        ? 'linear-gradient(90deg, #F59E0B, #D97706)'
-                        : 'linear-gradient(90deg, #F43F5E, #E11D48)',
-                    borderRadius: 5,
-                  },
-                }}
-              />
-            </Box>
-          )}
+
+                {/* 180-Degree Semi-Donut SVG Gauge */}
+                <Box sx={{ width: '100%', maxWidth: 220, position: 'relative', my: 0.5 }}>
+                  <svg viewBox="0 0 140 85" style={{ width: '100%', overflow: 'visible' }}>
+                    <defs>
+                      <linearGradient id="hwSemiGaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stopColor={gaugeColor} />
+                        <stop offset="100%" stopColor={gaugeColorEnd} />
+                      </linearGradient>
+                    </defs>
+
+                    {/* Background Arch */}
+                    <path
+                      d="M 16 72 A 54 54 0 0 1 124 72"
+                      fill="none"
+                      stroke="#F1F5F9"
+                      strokeWidth="13"
+                      strokeLinecap="round"
+                    />
+
+                    {/* Active Foreground Arch */}
+                    <path
+                      d="M 16 72 A 54 54 0 0 1 124 72"
+                      fill="none"
+                      stroke="url(#hwSemiGaugeGrad)"
+                      strokeWidth="13"
+                      strokeLinecap="round"
+                      strokeDasharray={archLength}
+                      strokeDashoffset={strokeOffset}
+                      style={{ transition: 'stroke-dashoffset 1s ease-in-out' }}
+                    />
+
+                    {/* Center Percentage Display */}
+                    <text
+                      x="70"
+                      y="64"
+                      textAnchor="middle"
+                      fill="#1E1B4B"
+                      fontSize="24"
+                      fontWeight="900"
+                      fontFamily="Vazirmatn, sans-serif"
+                    >
+                      ٪{toPersianDigits(rate)}
+                    </text>
+                  </svg>
+
+                  {/* Subtitle count below gauge */}
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      display: 'block',
+                      textAlign: 'center',
+                      color: '#64748B',
+                      fontWeight: 700,
+                      fontSize: '0.8rem',
+                      mt: -0.5,
+                    }}
+                  >
+                    {toPersianDigits(student.homeworkSubmitted)} از {toPersianDigits(student.homeworkTotal)} تکلیف تحویل شده
+                  </Typography>
+                </Box>
+              </Box>
+            );
+          })()}
         </Box>
 
         {/* ================= LEFT COLUMN: ADVISOR & SIGNATURE ================= */}
