@@ -46,12 +46,35 @@ body {
   background: #94a3b8;
 }
 
-/* Print Rules */
+/* Print Rules - Calibrated for A4 Landscape with Zero Dead Space */
 @media print {
-  body {
-    background: transparent !important;
+  @page {
+    size: A4 landscape;
+    margin: 0;
   }
-  .no-print {
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #FFFFFF !important;
+    width: 297mm !important;
+    height: 210mm !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .no-print, nav, aside, .MuiSpeedDial-root, .MuiSnackbar-root {
     display: none !important;
+  }
+  .report-card-container {
+    width: 297mm !important;
+    height: 210mm !important;
+    max-width: 297mm !important;
+    margin: 0 !important;
+    padding: 10mm 14mm !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    page-break-after: always !important;
+    break-after: page !important;
+    box-sizing: border-box !important;
   }
 }
