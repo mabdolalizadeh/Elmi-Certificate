@@ -21,11 +21,11 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 
-const GRADES = [
+export const GRADES = [
   { id: '7th', name: 'پایه هفتم', isAvailable: true, description: 'دوره اول متوسطه' },
-  { id: '8th', name: 'پایه هشتم', isAvailable: false, description: 'دوره اول متوسطه' },
-  { id: '9th', name: 'پایه نهم', isAvailable: false, description: 'دوره اول متوسطه' },
-  { id: '10th', name: 'پایه دهم', isAvailable: false, description: 'دوره دوم متوسطه' },
+  { id: '8th', name: 'پایه هشتم', isAvailable: true, description: 'دوره اول متوسطه' },
+  { id: '9th', name: 'پایه نهم', isAvailable: true, description: 'دوره اول متوسطه' },
+  { id: '10th', name: 'پایه دهم', isAvailable: true, description: 'دوره دوم متوسطه' },
 ];
 
 export default function Sidebar({

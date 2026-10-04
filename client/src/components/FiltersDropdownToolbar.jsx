@@ -30,6 +30,7 @@ import {
   ShieldCheck,
   Quote,
   Settings,
+  UserPlus,
 } from 'lucide-react';
 import { toPersianDigits } from '../utils/excelService';
 
@@ -50,6 +51,8 @@ export default function FiltersDropdownToolbar({
   onExportPdf,
   isExporting,
   onOpenSettings,
+  onOpenCreateStudent,
+  selectedGradeName = 'پایه هفتم',
 }) {
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -200,10 +203,47 @@ export default function FiltersDropdownToolbar({
               sx={{ display: { xs: 'none', lg: 'inline-flex' } }}
             />
           )}
+          {selectedGradeName && (
+            <Chip
+              label={selectedGradeName}
+              size="small"
+              sx={{
+                fontWeight: 800,
+                bgcolor: '#EEF2FF',
+                color: '#4F46E5',
+                border: '1px solid #C7D2FE',
+                borderRadius: 2,
+                px: 0.5,
+                display: { xs: 'none', md: 'inline-flex' },
+              }}
+            />
+          )}
         </Stack>
 
-        {/* Right / End: Selection & PDF Export Trigger */}
-        <Stack direction="row" spacing={1.5} alignItems="center" justifyContent="flex-end">
+        {/* Right / End: Create Student, Selection & PDF Export Trigger */}
+        <Stack direction="row" spacing={1.5} alignItems="center" justifyContent="flex-end" flexWrap="wrap" sx={{ gap: 1 }}>
+          {onOpenCreateStudent && (
+            <Button
+              variant="contained"
+              onClick={onOpenCreateStudent}
+              startIcon={<UserPlus size={17} />}
+              sx={{
+                background: 'linear-gradient(135deg, #4F46E5 0%, #4338CA 100%)',
+                color: '#FFFFFF',
+                fontWeight: 800,
+                borderRadius: 2.5,
+                px: 2.2,
+                whiteSpace: 'nowrap',
+                boxShadow: '0 4px 12px rgba(79, 70, 229, 0.28)',
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #4338CA 0%, #3730A3 100%)',
+                },
+              }}
+            >
+              افزودن دانش‌آموز
+            </Button>
+          )}
+
           <Button
             size="small"
             variant="outlined"

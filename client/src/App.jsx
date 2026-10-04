@@ -1,18 +1,20 @@
 import React, { useState, useMemo } from 'react';
 import { Box, Snackbar, Alert } from '@mui/material';
-import Sidebar from './components/Sidebar';
+import Sidebar, { GRADES } from './components/Sidebar';
 import FiltersDropdownToolbar from './components/FiltersDropdownToolbar';
 import ReportCardPreviewer from './components/ReportCardPreviewer';
 import ExportModal from './components/ExportModal';
 import ActionSpeedDial from './components/ActionSpeedDial';
 import GradeCustomizationModal from './components/GradeCustomizationModal';
 import DownloadTemplateModal from './components/DownloadTemplateModal';
+import CreateStudentModal from './components/CreateStudentModal';
 import { SAMPLE_STUDENTS, enrichStudentData, parseExcelFile } from './utils/excelService';
 import {
   loadGradeConfigs,
   saveGradeConfigs,
   extractUniqueScopes,
   resolveConfigForStudent,
+  detectGradeFromClassName,
 } from './utils/gradeConfigService';
 
 export default function App() {
@@ -27,10 +29,11 @@ export default function App() {
   const [selectedTrend, setSelectedTrend] = useState('ALL');
   const [currentPreviewIndex, setCurrentPreviewIndex] = useState(0);
 
-  // Grade customization settings state (synced with localStorage)
+  // Modals state
   const [gradeConfigs, setGradeConfigs] = useState(() => loadGradeConfigs());
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const [visibility, setVisibility] = useState({
     academic: true,
@@ -48,6 +51,13 @@ export default function App() {
   });
 
   const [notification, setNotification] = useState(null);
+
+  // Current active grade
+  const currentGradeObj = useMemo(() => {
+    return GRADES.find((g) => g.id === selectedGrade) || GRADES[0];
+  }, [selectedGrade]);
+
+  const currentGradeName = currentGradeObj ? currentGradeObj.name : 'پایه هفتم';
 
   // Available unique classes and grades
   const uniqueScopes = useMemo(() => extractUniqueScopes(students), [students]);
@@ -69,9 +79,70 @@ export default function App() {
     });
   };
 
+  // Add / Create Student Handler
+  const handleSaveNewStudent = (rawStudent) => {
+    try {
+      const enriched = enrichStudentData(rawStudent, students.length);
+      setStudents((prev) => [enriched, ...prev]);
+      setSelectedStudentIds((prev) => [enriched.id, ...prev]);
+      setCurrentPreviewIndex(0);
+
+      // Persist to backend SQLite database
+      fetch('http://localhost:5001/api/reports/batch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          reports: [
+            {
+              id: enriched.id,
+              student_id: enriched.id,
+              student_name: enriched.name,
+              class_name: enriched.className,
+              year: enriched.year,
+              month: enriched.month,
+              exam_period: `${enriched.month} ${enriched.year}`,
+              curr_total: enriched.currTotal,
+              prev_total: enriched.prevTotal,
+              curr_math: enriched.currMath,
+              prev_math: enriched.prevMath,
+              absences: enriched.absences,
+              tardies: enriched.tardies,
+              discipline: enriched.discipline,
+              homework_submitted: enriched.homeworkSubmitted,
+              homework_total: enriched.homeworkTotal,
+              homework_rate: enriched.homeworkRate,
+              advisor_note: enriched.advisorNote,
+            },
+          ],
+        }),
+      }).catch((e) => {
+        console.warn('Sync to backend db failed (working in client memory):', e.message);
+      });
+
+      setNotification({
+        severity: 'success',
+        message: `دانش‌آموز "${enriched.name}" در ${enriched.className} با موفقیت ایجاد و ثبت شد.`,
+      });
+    } catch (err) {
+      setNotification({
+        severity: 'error',
+        message: err.message || 'خطا در ثبت دانش‌آموز جدید.',
+      });
+    }
+  };
+
   // Filter students based on search term, class, and trend
   const filteredStudents = useMemo(() => {
     return students.filter((s) => {
+      // If student has explicit grade info that conflicts with selectedGrade, filter it
+      if (selectedGrade && currentGradeName) {
+        const studentGrade = detectGradeFromClassName(s.className);
+        const knownGrades = ['پایه هفتم', 'پایه هشتم', 'پایه نهم', 'پایه دهم'];
+        if (knownGrades.includes(studentGrade) && studentGrade !== currentGradeName) {
+          return false;
+        }
+      }
+
       if (searchTerm && !s.name.includes(searchTerm)) {
         return false;
       }
@@ -80,22 +151,22 @@ export default function App() {
         return false;
       }
 
-      if (selectedTrend === 'MATH_IMPROVE' && s.mathTrend.status !== 'improvement') {
+      if (selectedTrend === 'MATH_IMPROVE' && s.mathTrend?.status !== 'improvement') {
         return false;
       }
-      if (selectedTrend === 'MATH_DECLINE' && s.mathTrend.status !== 'decline') {
+      if (selectedTrend === 'MATH_DECLINE' && s.mathTrend?.status !== 'decline') {
         return false;
       }
-      if (selectedTrend === 'TOTAL_IMPROVE' && s.overallTrend.status !== 'improvement') {
+      if (selectedTrend === 'TOTAL_IMPROVE' && s.overallTrend?.status !== 'improvement') {
         return false;
       }
-      if (selectedTrend === 'TOTAL_DECLINE' && s.overallTrend.status !== 'decline') {
+      if (selectedTrend === 'TOTAL_DECLINE' && s.overallTrend?.status !== 'decline') {
         return false;
       }
 
       return true;
     });
-  }, [students, searchTerm, selectedClass, selectedTrend]);
+  }, [students, searchTerm, selectedClass, selectedTrend, selectedGrade, currentGradeName]);
 
   // SpeedDial handlers
   const handleFileSelect = async (file) => {
@@ -265,6 +336,8 @@ export default function App() {
           onExportPdf={handleExportPdf}
           isExporting={exportModalState.open && exportModalState.status === 'loading'}
           onOpenSettings={() => setIsSettingsOpen(true)}
+          onOpenCreateStudent={() => setIsCreateModalOpen(true)}
+          selectedGradeName={currentGradeName}
         />
 
         {/* Live Certificate Previewer */}
@@ -275,9 +348,19 @@ export default function App() {
             currentIndex={currentPreviewIndex}
             onIndexChange={setCurrentPreviewIndex}
             gradeConfigs={gradeConfigs}
+            onOpenCreateStudent={() => setIsCreateModalOpen(true)}
           />
         </Box>
       </Box>
+
+      {/* Create New Student / User Modal */}
+      <CreateStudentModal
+        open={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSaveStudent={handleSaveNewStudent}
+        currentGradeName={currentGradeName}
+        availableClasses={availableClasses}
+      />
 
       {/* Grade Customization Settings Modal */}
       <GradeCustomizationModal
@@ -301,7 +384,6 @@ export default function App() {
         open={isTemplateModalOpen}
         onClose={() => setIsTemplateModalOpen(false)}
         existingStudents={students}
-        availableClasses={availableClasses}
       />
 
       {/* Export Loading & Feedback Modal */}

@@ -6,10 +6,6 @@ import {
   DialogActions,
   Button,
   TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Stack,
   Box,
   Typography,
@@ -17,19 +13,11 @@ import {
   IconButton,
   Divider,
 } from '@mui/material';
-import { FileSpreadsheet, X, Download, Calendar, Layers, Clock } from 'lucide-react';
+import { FileSpreadsheet, X, Download, Calendar, Clock } from 'lucide-react';
 import {
   downloadExcelTemplate,
   SCHOOL_PERSIAN_MONTHS,
 } from '../utils/excelService';
-
-const AVAILABLE_GRADES_CLASSES = [
-  { label: 'پایه هفتم - کلاس هفتم ۱', grade: 'پایه هفتم', className: 'هفتم ۱' },
-  { label: 'پایه هفتم - کلاس هفتم ۲', grade: 'پایه هفتم', className: 'هفتم ۲' },
-  { label: 'پایه هفتم - کلاس هفتم ۳', grade: 'پایه هفتم', className: 'هفتم ۳' },
-  { label: 'پایه هشتم - کلاس هشتم ۱', grade: 'پایه هشتم', className: 'هشتم ۱' },
-  { label: 'پایه نهم - کلاس نهم ۱', grade: 'پایه نهم', className: 'نهم ۱' },
-];
 
 const AVAILABLE_YEARS = ['1403', '1404', '1405'];
 
@@ -37,23 +25,15 @@ export default function DownloadTemplateModal({
   open,
   onClose,
   existingStudents = [],
-  availableClasses = [],
 }) {
-  const [selectedClassOption, setSelectedClassOption] = useState('هفتم ۱');
   const [selectedYear, setSelectedYear] = useState('1403');
   const [selectedMonth, setSelectedMonth] = useState('آبان');
 
   const handleDownload = () => {
-    // If we have existing students in that class, use their names & UUIDs
-    const matchingStudents = existingStudents.filter(
-      (s) => s.className === selectedClassOption
-    );
-
     downloadExcelTemplate({
-      className: selectedClassOption,
       year: selectedYear,
       month: selectedMonth,
-      studentList: matchingStudents.length > 0 ? matchingStudents : existingStudents,
+      studentList: existingStudents,
     });
 
     onClose();
@@ -107,39 +87,6 @@ export default function DownloadTemplateModal({
 
       <DialogContent sx={{ p: 3 }}>
         <Stack spacing={3}>
-          {/* Grade & Class Selector */}
-          <Box>
-            <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1.2 }}>
-              <Layers size={18} color="#4F46E5" />
-              <Typography variant="subtitle2" sx={{ fontWeight: 800, color: '#1E293B' }}>
-                پایه و کلاس دانش‌آموزان:
-              </Typography>
-            </Stack>
-            <FormControl fullWidth size="small">
-              <InputLabel id="class-select-label">انتخاب کلاس</InputLabel>
-              <Select
-                labelId="class-select-label"
-                value={selectedClassOption}
-                label="انتخاب کلاس"
-                onChange={(e) => setSelectedClassOption(e.target.value)}
-                sx={{ borderRadius: 2 }}
-              >
-                {AVAILABLE_GRADES_CLASSES.map((item) => (
-                  <MenuItem key={item.className} value={item.className}>
-                    {item.label}
-                  </MenuItem>
-                ))}
-                {availableClasses
-                  .filter((c) => !AVAILABLE_GRADES_CLASSES.some((a) => a.className === c))
-                  .map((c) => (
-                    <MenuItem key={c} value={c}>
-                      کلاس {c}
-                    </MenuItem>
-                  ))}
-              </Select>
-            </FormControl>
-          </Box>
-
           {/* Year Selector */}
           <Box>
             <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1.2 }}>

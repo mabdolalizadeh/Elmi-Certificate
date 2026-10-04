@@ -18,6 +18,7 @@ import {
   Eye,
   Maximize2,
   Users,
+  UserPlus,
 } from 'lucide-react';
 import ReportCard from './ReportCard';
 import { toPersianDigits } from '../utils/excelService';
@@ -58,6 +59,7 @@ export default function ReportCardPreviewer({
   currentIndex,
   onIndexChange,
   gradeConfigs = {},
+  onOpenCreateStudent,
 }) {
   const [[page, direction], setPage] = useState([currentIndex || 0, 0]);
 
@@ -125,8 +127,30 @@ export default function ReportCardPreviewer({
             دانش‌آموزی برای نمایش وجود ندارد
           </Typography>
           <Typography variant="body2" sx={{ color: '#94A3B8', maxWidth: 400 }}>
-            لطفاً یک فایل اکسل بارگذاری کنید یا فیلترهای اعمال شده در بخش بالا را تنظیم فرمایید.
+            لطفاً یک فایل اکسل بارگذاری کنید یا با دکمه زیر اولین دانش‌آموز را ثبت فرمایید.
           </Typography>
+          {onOpenCreateStudent && (
+            <Button
+              variant="contained"
+              onClick={onOpenCreateStudent}
+              startIcon={<UserPlus size={18} />}
+              sx={{
+                background: 'linear-gradient(135deg, #4F46E5 0%, #4338CA 100%)',
+                color: '#FFFFFF',
+                fontWeight: 800,
+                borderRadius: 2.5,
+                px: 3,
+                py: 1.1,
+                mt: 1,
+                boxShadow: '0 4px 14px rgba(79, 70, 229, 0.3)',
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #4338CA 0%, #3730A3 100%)',
+                },
+              }}
+            >
+              افزودن دانش‌آموز جدید
+            </Button>
+          )}
         </Stack>
       </Card>
     );

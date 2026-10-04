@@ -369,27 +369,33 @@ export const enrichStudentData = (rawStudent, index = 0) => {
  * 12. نکته مشاورهای
  */
 export const downloadExcelTemplate = ({
-  className = 'هفتم ۱',
+  className = '',
   year = '1403',
   month = 'آبان',
   studentList = [],
 } = {}) => {
-  // Use provided roster or fall back to default sample students
-  const roster = studentList.length > 0 ? studentList : SAMPLE_STUDENTS;
+  // Use provided roster or empty starter rows
+  const roster = studentList.length > 0 ? studentList : [
+    { id: 'std-001', name: '' },
+    { id: 'std-002', name: '' },
+    { id: 'std-003', name: '' },
+    { id: 'std-004', name: '' },
+    { id: 'std-005', name: '' },
+  ];
 
   const rows = roster.map((s, idx) => ({
     'شناسه (UUID)': s.id || `std-${String(idx + 1).padStart(3, '0')}`,
-    'نام و نام خانوادگی': s.name || `دانش‌آموز ${idx + 1}`,
+    'نام و نام خانوادگی': s.name || '',
     'سال': year,
     'ماه': month,
-    'درصد کل': s.currTotal ?? 85,
-    'درصد ریاضی': s.currMath ?? 80,
-    'غیبت': s.absences ?? 0,
-    'تاخیر': s.tardies ?? 0,
-    'وضعیت انضباط': s.discipline || 'خوب',
-    'تکالیف تحویل شده': s.homeworkSubmitted ?? 25,
-    'کل تکالیف': s.homeworkTotal ?? 30,
-    'نکته مشاورهای': s.advisorNote || 'تلاش مستمر و نظم در ارسال تکالیف باعث پیشرفت بیشتر خواهد شد.',
+    'درصد کل': s.currTotal ?? '',
+    'درصد ریاضی': s.currMath ?? '',
+    'غیبت': s.absences ?? '',
+    'تاخیر': s.tardies ?? '',
+    'وضعیت انضباط': s.discipline || '',
+    'تکالیف تحویل شده': s.homeworkSubmitted ?? '',
+    'کل تکالیف': s.homeworkTotal ?? '',
+    'نکته مشاورهای': s.advisorNote || '',
   }));
 
   const worksheet = XLSX.utils.json_to_sheet(rows, {
@@ -416,7 +422,9 @@ export const downloadExcelTemplate = ({
   XLSX.utils.book_append_sheet(workbook, worksheet, `کارنامه ${month} ${year}`);
 
   // Generate filename with selected month and year
-  const safeFilename = `قالب_کارنامه_${className.replace(/\s+/g, '_')}_${month}_${year}.xlsx`;
+  const safeFilename = className
+    ? `قالب_کارنامه_${className.replace(/\s+/g, '_')}_${month}_${year}.xlsx`
+    : `قالب_کارنامه_${month}_${year}.xlsx`;
   XLSX.writeFile(workbook, safeFilename);
 };
 
