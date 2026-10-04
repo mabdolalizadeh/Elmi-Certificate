@@ -137,10 +137,10 @@ export default function ReportCard({
             height: '100%',
           }}
         >
-          {config.watermark.type === 'logo' && (config.watermark.logoUrl || config.logoUrl) ? (
+          {config.watermark.type === 'logo' ? (
             <Box
               component="img"
-              src={config.watermark.logoUrl || config.logoUrl}
+              src={config.watermark.logoUrl || config.logoUrl || '/logo.svg'}
               alt="Watermark Logo"
               sx={{
                 maxWidth: '52%',
@@ -220,17 +220,23 @@ export default function ReportCard({
                   width: config.logoSize || 54,
                   height: config.logoSize || 54,
                   borderRadius: '16px',
-                  background: 'linear-gradient(135deg, #1E1B4B 0%, #3730A3 100%)',
-                  color: '#FBBF24',
+                  bgcolor: '#FFFFFF',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  boxShadow: '0 6px 16px rgba(49, 46, 129, 0.25)',
-                  border: '2px solid #E0E7FF',
+                  boxShadow: '0 4px 14px rgba(0, 0, 0, 0.08)',
+                  border: '1.5px solid #E2E8F0',
+                  p: 0.6,
                   flexShrink: 0,
+                  overflow: 'hidden',
                 }}
               >
-                <Award size={Math.round((config.logoSize || 54) * 0.6)} />
+                <Box
+                  component="img"
+                  src="/logo.svg"
+                  alt="School Logo"
+                  sx={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                />
               </Box>
             )}
 

@@ -49,18 +49,25 @@ export default function Header() {
             <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 1.5 }}>
               <Box
                 sx={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: '12px',
-                  background: 'rgba(255, 255, 255, 0.15)',
-                  backdropFilter: 'blur(8px)',
+                  width: 48,
+                  height: 48,
+                  borderRadius: '14px',
+                  bgcolor: '#FFFFFF',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  boxShadow: '0 6px 16px rgba(0, 0, 0, 0.2)',
+                  p: 0.75,
+                  overflow: 'hidden',
+                  flexShrink: 0,
                 }}
               >
-                <Award size={26} color="#FBBF24" />
+                <Box
+                  component="img"
+                  src="/logo.svg"
+                  alt="لوگوی سامانه"
+                  sx={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                />
               </Box>
               <Typography variant="h4" component="h1" sx={{ fontWeight: 800, letterSpacing: '-0.5px' }}>
                 سامانه هوشمند صدور و تحلیل کارنامه

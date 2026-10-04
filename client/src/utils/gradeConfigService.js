@@ -7,13 +7,14 @@ export const DEFAULT_GRADE_CONFIG = {
   title: 'مجتمع آموزشی و دبیرستان نمونه رشد',
   subtitle: 'کارنامه رسمی عملکرد تحصیلی، رفتار کلاسی و تحلیل رشد مستمر دانش‌آموز',
   examPeriod: 'سال تحصیلی ۱۴۰۵-۱۴۰۴ • نوبت دوم',
-  logoUrl: '', // base64 or image URL
+  logoUrl: '/logo.svg', // base64 or image URL
   logoAlignment: 'right', // 'right' | 'center' | 'left'
   logoSize: 54, // in px (36 to 80)
   watermark: {
     enabled: false,
     type: 'text', // 'text' | 'logo'
     text: 'دبیرستان رشد',
+    logoUrl: '/logo.svg',
     opacity: 0.08, // 0.05 to 0.30
     rotation: -30, // degrees (-45 to 45)
   },

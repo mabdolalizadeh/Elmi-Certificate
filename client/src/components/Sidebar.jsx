@@ -57,15 +57,23 @@ export default function Sidebar({
               width: 44,
               height: 44,
               borderRadius: 2.5,
-              background: 'linear-gradient(135deg, #1E1B4B 0%, #4338CA 100%)',
-              color: '#FFFFFF',
+              bgcolor: '#FFFFFF',
+              border: '1.5px solid #E0E7FF',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 4px 12px rgba(67, 56, 202, 0.25)',
+              boxShadow: '0 4px 12px rgba(67, 56, 202, 0.12)',
+              p: 0.6,
+              overflow: 'hidden',
+              flexShrink: 0,
             }}
           >
-            <Award size={24} color="#FBBF24" />
+            <Box
+              component="img"
+              src="/logo.svg"
+              alt="لوگوی دبیرستان رشد"
+              sx={{ width: '100%', height: '100%', objectFit: 'contain' }}
+            />
           </Box>
           <Box>
             <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#1E1B4B', lineHeight: 1.2 }}>

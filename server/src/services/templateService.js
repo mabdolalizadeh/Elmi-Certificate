@@ -1,3 +1,27 @@
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+let DEFAULT_LOGO_DATA_URI = '';
+try {
+  const possiblePaths = [
+    path.resolve(__dirname, '../../public/logo.svg'),
+    path.resolve(__dirname, '../../../client/public/logo.svg'),
+  ];
+  for (const p of possiblePaths) {
+    if (fs.existsSync(p)) {
+      const svg = fs.readFileSync(p, 'utf8');
+      DEFAULT_LOGO_DATA_URI = `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`;
+      break;
+    }
+  }
+} catch (e) {
+  // Graceful fallback
+}
+
 /**
  * Generates standalone, self-contained HTML for multi-page A4 Landscape PDF.
  * Calibrated for zero dead space, rich visual charts, and exact print proportions.
@@ -265,8 +289,8 @@ export function generatePdfHtml(students = [], visibility = {}, gradeConfigs = {
             height: 100%;
           ">
             ${
-              config.watermark.type === 'logo' && (config.watermark.logoUrl || config.logoUrl)
-                ? `<img src="${config.watermark.logoUrl || config.logoUrl}" alt="Watermark" style="max-width: 50%; max-height: 50%; object-fit: contain; filter: grayscale(100%);" />`
+              config.watermark.type === 'logo'
+                ? `<img src="${(config.watermark.logoUrl && config.watermark.logoUrl !== '/logo.svg') ? config.watermark.logoUrl : (config.logoUrl && config.logoUrl !== '/logo.svg' ? config.logoUrl : DEFAULT_LOGO_DATA_URI)}" alt="Watermark" style="max-width: 50%; max-height: 50%; object-fit: contain; filter: grayscale(100%);" />`
                 : `<div style="font-size: 52px; font-weight: 900; color: #1E1B4B; white-space: nowrap; letter-spacing: 8px; text-transform: uppercase;">
                     ${config.watermark.text || 'کارنامه رسمی و محرمانه'}
                   </div>`
@@ -279,7 +303,7 @@ export function generatePdfHtml(students = [], visibility = {}, gradeConfigs = {
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            opacity: 0.02;
+            opacity: 0.03;
             pointer-events: none;
             user-select: none;
             z-index: 0;
@@ -290,10 +314,14 @@ export function generatePdfHtml(students = [], visibility = {}, gradeConfigs = {
             height: 100%;
             color: #000;
           ">
-            <svg viewBox="0 0 24 24" width="300" height="300" stroke="#000000" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="8" r="7"></circle>
-              <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
-            </svg>
+            ${
+              DEFAULT_LOGO_DATA_URI
+                ? `<img src="${DEFAULT_LOGO_DATA_URI}" alt="Watermark" style="max-width: 300px; max-height: 300px; object-fit: contain; filter: grayscale(100%);" />`
+                : `<svg viewBox="0 0 24 24" width="300" height="300" stroke="#000000" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="8" r="7"></circle>
+                    <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+                  </svg>`
+            }
           </div>
           `
           }
@@ -301,16 +329,18 @@ export function generatePdfHtml(students = [], visibility = {}, gradeConfigs = {
           <!-- HEADER -->
           <div class="card-header" style="position: relative; z-index: 1;">
             <div class="school-info" style="${config.logoAlignment === 'left' ? 'flex-direction: row-reverse;' : ''}">
-              ${
-                config.logoUrl
-                  ? `<img src="${config.logoUrl}" alt="School Logo" style="height:${config.logoSize || 44}px; max-width:${(config.logoSize || 44) * 1.6}px; object-fit:contain; border-radius:8px;" />`
-                  : `<div class="school-icon" style="width:${config.logoSize || 44}px; height:${config.logoSize || 44}px; display:flex; align-items:center; justify-content:center;">
+              ${(() => {
+                const effectiveLogo = (config.logoUrl && config.logoUrl !== '/logo.svg') ? config.logoUrl : DEFAULT_LOGO_DATA_URI;
+                if (effectiveLogo) {
+                  return `<img src="${effectiveLogo}" alt="School Logo" style="height:${config.logoSize || 44}px; max-width:${(config.logoSize || 44) * 1.6}px; object-fit:contain; border-radius:8px;" />`;
+                }
+                return `<div class="school-icon" style="width:${config.logoSize || 44}px; height:${config.logoSize || 44}px; display:flex; align-items:center; justify-content:center;">
                       <svg viewBox="0 0 24 24" width="${Math.round((config.logoSize || 44) * 0.58)}" height="${Math.round((config.logoSize || 44) * 0.58)}" stroke="#FBBF24" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="8" r="7"></circle>
                         <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
                       </svg>
-                    </div>`
-              }
+                    </div>`;
+              })()}
               <div>
                 <div class="school-name">
                   <span>${config.title || 'مجتمع آموزشی و دبیرستان نمونه رشد'}</span>
