@@ -82,11 +82,18 @@ export function generatePdfHtml(students = [], visibility = {}, gradeConfigs = {
     if (!trend) return '';
     const diffAbs = Math.abs(trend.diff);
     const diffSign = trend.diff > 0 ? `+${toPersianDigits(diffAbs)}٪` : trend.diff < 0 ? `-${toPersianDigits(diffAbs)}٪` : `${toPersianDigits(0)}٪`;
-    const arrowSymbol = trend.status === 'improvement' ? '▲' : trend.status === 'decline' ? '▼' : '▬';
+    let iconSvg = '';
+    if (trend.status === 'improvement') {
+      iconSvg = `<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>`;
+    } else if (trend.status === 'decline') {
+      iconSvg = `<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline><polyline points="17 18 23 18 23 12"></polyline></svg>`;
+    } else {
+      iconSvg = `<svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>`;
+    }
 
     return `
       <div style="display:inline-flex; align-items:center; gap:4px; padding:3px 8px; border-radius:6px; background:${trend.bgColor}; color:${trend.color}; border:1px solid ${trend.color}40; font-size:11px; font-weight:800;">
-        <span>${arrowSymbol}</span>
+        <span style="display:flex; align-items:center;">${iconSvg}</span>
         <span>${trend.label}</span>
         <span style="direction:ltr; font-size:11px;">(${diffSign})</span>
       </div>
@@ -159,7 +166,6 @@ export function generatePdfHtml(students = [], visibility = {}, gradeConfigs = {
             pointer-events: none;
             user-select: none;
             z-index: 0;
-            font-size: 260px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -167,7 +173,10 @@ export function generatePdfHtml(students = [], visibility = {}, gradeConfigs = {
             height: 100%;
             color: #000;
           ">
-            🎓
+            <svg viewBox="0 0 24 24" width="300" height="300" stroke="#000000" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="8" r="7"></circle>
+              <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+            </svg>
           </div>
           `
           }
@@ -178,7 +187,12 @@ export function generatePdfHtml(students = [], visibility = {}, gradeConfigs = {
               ${
                 config.logoUrl
                   ? `<img src="${config.logoUrl}" alt="School Logo" style="height:${config.logoSize || 44}px; max-width:${(config.logoSize || 44) * 1.6}px; object-fit:contain; border-radius:8px;" />`
-                  : `<div class="school-icon" style="width:${config.logoSize || 44}px; height:${config.logoSize || 44}px;">🎓</div>`
+                  : `<div class="school-icon" style="width:${config.logoSize || 44}px; height:${config.logoSize || 44}px; display:flex; align-items:center; justify-content:center;">
+                      <svg viewBox="0 0 24 24" width="${Math.round((config.logoSize || 44) * 0.58)}" height="${Math.round((config.logoSize || 44) * 0.58)}" stroke="#FBBF24" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="8" r="7"></circle>
+                        <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+                      </svg>
+                    </div>`
               }
               <div>
                 <div class="school-name">
@@ -207,7 +221,12 @@ export function generatePdfHtml(students = [], visibility = {}, gradeConfigs = {
                 ? `
             <div class="column-card">
               <div class="column-title">
-                <span class="col-icon">📚</span>
+                <span class="col-icon" style="display:flex; align-items:center;">
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="#4F46E5" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                  </svg>
+                </span>
                 <span>تحلیل مقایسه‌ای نمرات و آزمون‌ها</span>
               </div>
 
@@ -278,7 +297,12 @@ export function generatePdfHtml(students = [], visibility = {}, gradeConfigs = {
             <!-- CENTER COLUMN: BEHAVIORAL & RADIAL HOMEWORK GAUGE -->
             <div class="column-card">
               <div class="column-title">
-                <span class="col-icon">🛡️</span>
+                <span class="col-icon" style="display:flex; align-items:center;">
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="#10B981" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    <path d="m9 12 2 2 4-4"></path>
+                  </svg>
+                </span>
                 <span>انضباط، تکالیف و شاخص‌های حضور</span>
               </div>
 
@@ -288,11 +312,27 @@ export function generatePdfHtml(students = [], visibility = {}, gradeConfigs = {
                   ? `
               <div class="attendance-grid">
                 <div class="att-card" style="border: 1.5px solid #FEE2E2;">
-                  <div class="att-title" style="color:#DC2626;">📅 میزان غیبت‌ها</div>
+                  <div class="att-title" style="color:#DC2626; display:flex; align-items:center; gap:4px;">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="#DC2626" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                      <rect width="18" height="18" x="3" y="4" rx="2"></rect>
+                      <line x1="16" x2="16" y1="2" y2="6"></line>
+                      <line x1="8" x2="8" y1="2" y2="6"></line>
+                      <line x1="3" x2="21" y1="10" y2="10"></line>
+                      <line x1="10" x2="14" y1="14" y2="18"></line>
+                      <line x1="14" x2="10" y1="14" y2="18"></line>
+                    </svg>
+                    <span>میزان غیبت‌ها</span>
+                  </div>
                   <div class="att-value">${toPersianDigits(student.absences)} <span class="att-unit">روز</span></div>
                 </div>
                 <div class="att-card" style="border: 1.5px solid #FEF3C7;">
-                  <div class="att-title" style="color:#D97706;">⏰ تعداد تاخیرها</div>
+                  <div class="att-title" style="color:#D97706; display:flex; align-items:center; gap:4px;">
+                    <svg viewBox="0 0 24 24" width="13" height="13" stroke="#D97706" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <span>تعداد تاخیرها</span>
+                  </div>
                   <div class="att-value">${toPersianDigits(student.tardies)} <span class="att-unit">مورد</span></div>
                 </div>
               </div>
@@ -356,13 +396,17 @@ export function generatePdfHtml(students = [], visibility = {}, gradeConfigs = {
               }
             </div>
 
-            <!-- LEFT COLUMN: COMPACT ADVISOR NOTE & EXPANDED SIGNATURES (NO STAMP) -->
+            <!-- LEFT COLUMN: COMPACT ADVISOR NOTE & TWO SQUARE SIGNATURE BOXES -->
             ${
               vis.advisor
                 ? `
             <div class="column-card">
               <div class="column-title">
-                <span class="col-icon">💬</span>
+                <span class="col-icon" style="display:flex; align-items:center;">
+                  <svg viewBox="0 0 24 24" width="16" height="16" stroke="#8B5CF6" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                </span>
                 <span>توصیه مشاور و تایید نهایی</span>
               </div>
 
@@ -380,30 +424,38 @@ export function generatePdfHtml(students = [], visibility = {}, gradeConfigs = {
                 </div>
               </div>
 
-              <!-- Expanded Formal Signature Area (NO STAMP) -->
+              <!-- Expanded Formal Signature Area with Two Square Boxes -->
               <div class="expanded-signature-box">
                 <div class="sig-status-row">
-                  <span class="sig-status-title">✔️ تاییدیه رسمی شورای آموزشی مدرسه</span>
+                  <span class="sig-status-title" style="display:flex; align-items:center; gap:4px;">
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="#4F46E5" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                      <polyline points="14 2 14 8 20 8"></polyline>
+                      <path d="m9 15 2 2 4-4"></path>
+                    </svg>
+                    <span>تاییدیه رسمی شورای آموزشی مدرسه</span>
+                  </span>
                   <span class="sig-status-date">ثبت قطعی: مهرماه ۱۴۰۵</span>
                 </div>
 
+                <!-- Two Square Signature Zones Side-by-Side -->
                 <div class="sig-zones">
-                  <!-- Counselor Signature -->
-                  <div class="sig-zone-item" style="min-height: 46px; display: flex; justify-content: space-between; align-items: center;">
+                  <!-- Counselor Signature Square -->
+                  <div class="sig-zone-square">
                     <div>
-                      <div class="sig-role">محل امضای مشاور تحصیلی پایه</div>
-                      <div class="sig-school">${config.title || 'مجتمع آموزشی رشد'}</div>
+                      <div class="sig-role">محل امضای مشاور</div>
+                      <div class="sig-school">${config.title || 'مشاور تحصیلی پایه'}</div>
                     </div>
-                    <div style="width: 110px; border-bottom: 1.5px dashed #CBD5E1; height: 20px;"></div>
+                    <div class="sig-line"></div>
                   </div>
 
-                  <!-- Principal Signature -->
-                  <div class="sig-zone-item" style="min-height: 46px; display: flex; justify-content: space-between; align-items: center;">
+                  <!-- Principal Signature Square -->
+                  <div class="sig-zone-square">
                     <div>
-                      <div class="sig-role">محل امضای مدیریت آموزشگاه</div>
+                      <div class="sig-role">محل امضای مدیریت</div>
                       <div class="sig-school">تایید نهایی و صدور کارنامه</div>
                     </div>
-                    <div style="width: 110px; border-bottom: 1.5px dashed #CBD5E1; height: 20px;"></div>
+                    <div class="sig-line"></div>
                   </div>
                 </div>
 
@@ -418,7 +470,6 @@ export function generatePdfHtml(students = [], visibility = {}, gradeConfigs = {
 
           <!-- FOOTER -->
           <div class="card-footer">
-            <div>کد یکتای پرونده: ELMI-${toPersianDigits((student.id || 'STD01').replace('student-', ''))} • ثبت شده در سامانه یکپارچه رشد</div>
             <div>تاریخ صدور: مهرماه ۱۴۰۵ • صفحه ۱ از ۱</div>
           </div>
         </div>
@@ -830,28 +881,39 @@ export function generatePdfHtml(students = [], visibility = {}, gradeConfigs = {
       font-weight: 600;
     }
     .sig-zones {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 8px 0;
+      flex: 1;
+    }
+    .sig-zone-square {
+      background: #F8FAFC;
+      border: 1.5px dashed #CBD5E1;
+      border-radius: 8px;
+      padding: 8px 6px;
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      margin: 6px 0;
-    }
-    .sig-zone-item {
-      background: #F8FAFC;
-      border: 1px dashed #CBD5E1;
-      border-radius: 8px;
-      padding: 6px 10px;
-      display: flex;
       justify-content: space-between;
       align-items: center;
+      min-height: 96px;
+      text-align: center;
+      box-sizing: border-box;
     }
     .sig-role {
       font-size: 11px;
       font-weight: 800;
-      color: #475569;
+      color: #1E293B;
     }
     .sig-school {
       font-size: 9.5px;
       color: #94A3B8;
+      margin-top: 2px;
+    }
+    .sig-line {
+      width: 82%;
+      border-bottom: 1.5px dashed #94A3B8;
+      margin-bottom: 4px;
     }
     .sig-notice {
       font-size: 9.5px;

@@ -994,60 +994,62 @@ export default function ReportCard({
                 </Typography>
               </Stack>
 
-              {/* Dual Designated Signature Zones Filling the Vertical Height */}
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, my: 1 }}>
-                {/* Counselor Signature Box */}
+              {/* Dual Designated Signature Zones - Two Squares Side-by-Side */}
+              <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1.5, my: 1, flex: 1 }}>
+                {/* Counselor Signature Square Box */}
                 <Box
                   sx={{
                     bgcolor: '#F8FAFC',
                     borderRadius: 2.5,
                     p: 1.5,
-                    border: '1px dashed #CBD5E1',
-                    position: 'relative',
-                    minHeight: 52,
+                    border: '1.5px dashed #CBD5E1',
                     display: 'flex',
-                    alignItems: 'center',
+                    flexDirection: 'column',
                     justifyContent: 'space-between',
+                    alignItems: 'center',
+                    minHeight: 105,
+                    textAlign: 'center',
                   }}
                 >
-                  <Box>
-                    <Typography variant="caption" sx={{ fontWeight: 800, color: '#475569', display: 'block', fontSize: '0.78rem' }}>
-                      محل امضای مشاور تحصیلی پایه
+                  <Box sx={{ width: '100%' }}>
+                    <Typography variant="caption" sx={{ fontWeight: 800, color: '#1E293B', display: 'block', fontSize: '0.78rem' }}>
+                      محل امضای مشاور
                     </Typography>
-                    <Typography variant="caption" sx={{ color: '#94A3B8', fontSize: '0.7rem' }}>
-                      {config.title || 'مجتمع آموزشی رشد'}
+                    <Typography variant="caption" sx={{ color: '#94A3B8', fontSize: '0.68rem', display: 'block', mt: 0.2 }}>
+                      {config.title || 'مشاور تحصیلی پایه'}
                     </Typography>
                   </Box>
 
                   {/* Clean Designated Signing Space */}
                   <Box
                     sx={{
-                      width: 120,
-                      borderBottom: '1.5px dashed #CBD5E1',
-                      height: 24,
+                      width: '85%',
+                      borderBottom: '1.5px dashed #94A3B8',
+                      mb: 1,
                     }}
                   />
                 </Box>
 
-                {/* Principal Signature Box */}
+                {/* Principal Signature Square Box */}
                 <Box
                   sx={{
                     bgcolor: '#F8FAFC',
                     borderRadius: 2.5,
                     p: 1.5,
-                    border: '1px dashed #CBD5E1',
-                    position: 'relative',
-                    minHeight: 52,
+                    border: '1.5px dashed #CBD5E1',
                     display: 'flex',
-                    alignItems: 'center',
+                    flexDirection: 'column',
                     justifyContent: 'space-between',
+                    alignItems: 'center',
+                    minHeight: 105,
+                    textAlign: 'center',
                   }}
                 >
-                  <Box>
-                    <Typography variant="caption" sx={{ fontWeight: 800, color: '#475569', display: 'block', fontSize: '0.78rem' }}>
-                      محل امضای مدیریت آموزشگاه
+                  <Box sx={{ width: '100%' }}>
+                    <Typography variant="caption" sx={{ fontWeight: 800, color: '#1E293B', display: 'block', fontSize: '0.78rem' }}>
+                      محل امضای مدیریت
                     </Typography>
-                    <Typography variant="caption" sx={{ color: '#94A3B8', fontSize: '0.7rem' }}>
+                    <Typography variant="caption" sx={{ color: '#94A3B8', fontSize: '0.68rem', display: 'block', mt: 0.2 }}>
                       تایید نهایی و صدور کارنامه
                     </Typography>
                   </Box>
@@ -1055,18 +1057,15 @@ export default function ReportCard({
                   {/* Clean Designated Signing Space */}
                   <Box
                     sx={{
-                      width: 120,
-                      borderBottom: '1.5px dashed #CBD5E1',
-                      height: 24,
+                      width: '85%',
+                      borderBottom: '1.5px dashed #94A3B8',
+                      mb: 1,
                     }}
                   />
                 </Box>
               </Box>
 
-              {/* Bottom Notice */}
-              <Typography variant="caption" sx={{ color: '#94A3B8', fontSize: '0.7rem', textAlign: 'center', display: 'block' }}>
-                کارنامه معتبر بدون نیاز به مهر فیزیکی دارای کد پیگیری یکپارچه است
-              </Typography>
+         
             </Box>
           </Box>
         )}
@@ -1081,9 +1080,7 @@ export default function ReportCard({
         }}
       >
         <Stack direction="row" justifyContent="space-between" alignItems="center">
-          <Typography variant="caption" sx={{ color: '#94A3B8', fontSize: '0.75rem', fontWeight: 600 }}>
-            کد یکتای پرونده: ELMI-{toPersianDigits(student.id?.replace('student-', ''))} • ثبت شده در سامانه یکپارچه رشد
-          </Typography>
+          
           <Typography variant="caption" sx={{ color: '#94A3B8', fontSize: '0.75rem', fontWeight: 600 }}>
             تاریخ صدور: مهرماه ۱۴۰۵ • صفحه ۱ از ۱
           </Typography>
