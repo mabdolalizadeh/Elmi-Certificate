@@ -337,7 +337,6 @@ export default function App() {
           isExporting={exportModalState.open && exportModalState.status === 'loading'}
           onOpenSettings={() => setIsSettingsOpen(true)}
           onOpenCreateStudent={() => setIsCreateModalOpen(true)}
-          selectedGradeName={currentGradeName}
         />
 
         {/* Live Certificate Previewer */}

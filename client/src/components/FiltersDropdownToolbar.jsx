@@ -13,6 +13,7 @@ import {
   FormControlLabel,
   Badge,
   Tooltip,
+  IconButton,
 } from '@mui/material';
 import {
   Search,
@@ -52,7 +53,6 @@ export default function FiltersDropdownToolbar({
   isExporting,
   onOpenSettings,
   onOpenCreateStudent,
-  selectedGradeName = 'پایه هفتم',
 }) {
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -130,6 +130,34 @@ export default function FiltersDropdownToolbar({
             }}
           />
 
+          {/* Add User Icon Button (no text, near search box) */}
+          {onOpenCreateStudent && (
+            <Tooltip title="افزودن دانش‌آموز جدید">
+              <IconButton
+                onClick={onOpenCreateStudent}
+                sx={{
+                  bgcolor: '#EEF2FF',
+                  color: '#4F46E5',
+                  border: '1.5px solid #C7D2FE',
+                  borderRadius: 2.5,
+                  p: 1.1,
+                  boxShadow: '0 2px 8px rgba(79, 70, 229, 0.12)',
+                  flexShrink: 0,
+                  transition: 'all 0.15s ease-in-out',
+                  '&:hover': {
+                    bgcolor: '#4F46E5',
+                    color: '#FFFFFF',
+                    borderColor: '#4F46E5',
+                    transform: 'translateY(-1px)',
+                    boxShadow: '0 4px 12px rgba(79, 70, 229, 0.28)',
+                  },
+                }}
+              >
+                <UserPlus size={19} />
+              </IconButton>
+            </Tooltip>
+          )}
+
           {/* Filters Dropdown Trigger Button */}
           <Badge badgeContent={activeFilterCount > 0 ? toPersianDigits(activeFilterCount) : 0} color="primary" overlap="circular">
             <Button
@@ -203,47 +231,10 @@ export default function FiltersDropdownToolbar({
               sx={{ display: { xs: 'none', lg: 'inline-flex' } }}
             />
           )}
-          {selectedGradeName && (
-            <Chip
-              label={selectedGradeName}
-              size="small"
-              sx={{
-                fontWeight: 800,
-                bgcolor: '#EEF2FF',
-                color: '#4F46E5',
-                border: '1px solid #C7D2FE',
-                borderRadius: 2,
-                px: 0.5,
-                display: { xs: 'none', md: 'inline-flex' },
-              }}
-            />
-          )}
         </Stack>
 
-        {/* Right / End: Create Student, Selection & PDF Export Trigger */}
+        {/* Right / End: Selection & PDF Export Trigger */}
         <Stack direction="row" spacing={1.5} alignItems="center" justifyContent="flex-end" flexWrap="wrap" sx={{ gap: 1 }}>
-          {onOpenCreateStudent && (
-            <Button
-              variant="contained"
-              onClick={onOpenCreateStudent}
-              startIcon={<UserPlus size={17} />}
-              sx={{
-                background: 'linear-gradient(135deg, #4F46E5 0%, #4338CA 100%)',
-                color: '#FFFFFF',
-                fontWeight: 800,
-                borderRadius: 2.5,
-                px: 2.2,
-                whiteSpace: 'nowrap',
-                boxShadow: '0 4px 12px rgba(79, 70, 229, 0.28)',
-                '&:hover': {
-                  background: 'linear-gradient(135deg, #4338CA 0%, #3730A3 100%)',
-                },
-              }}
-            >
-              افزودن دانش‌آموز
-            </Button>
-          )}
-
           <Button
             size="small"
             variant="outlined"
