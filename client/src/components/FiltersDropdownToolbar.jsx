@@ -130,26 +130,28 @@ export default function FiltersDropdownToolbar({
             }}
           />
 
-          {/* Add User Icon Button (no text, near search box) */}
+          {/* Add User Icon Button (no text, near search box, completely circular) */}
           {onOpenCreateStudent && (
-            <Tooltip title="افزودن دانش‌آموز جدید">
+            <Tooltip title="تعریف و ثبت دانش‌آموز جدید">
               <IconButton
                 onClick={onOpenCreateStudent}
                 sx={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: '50%',
                   bgcolor: '#EEF2FF',
                   color: '#4F46E5',
                   border: '1.5px solid #C7D2FE',
-                  borderRadius: 2.5,
-                  p: 1.1,
-                  boxShadow: '0 2px 8px rgba(79, 70, 229, 0.12)',
+                  p: 0,
+                  boxShadow: '0 2px 8px rgba(79, 70, 229, 0.15)',
                   flexShrink: 0,
                   transition: 'all 0.15s ease-in-out',
                   '&:hover': {
                     bgcolor: '#4F46E5',
                     color: '#FFFFFF',
                     borderColor: '#4F46E5',
-                    transform: 'translateY(-1px)',
-                    boxShadow: '0 4px 12px rgba(79, 70, 229, 0.28)',
+                    transform: 'scale(1.06)',
+                    boxShadow: '0 4px 12px rgba(79, 70, 229, 0.3)',
                   },
                 }}
               >

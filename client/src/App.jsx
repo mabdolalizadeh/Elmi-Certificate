@@ -79,54 +79,57 @@ export default function App() {
     });
   };
 
-  // Add / Create Student Handler
-  const handleSaveNewStudent = (rawStudent) => {
+  // Add / Create Student Handler (Batch or single)
+  const handleSaveStudents = (newStudentsList) => {
     try {
-      const enriched = enrichStudentData(rawStudent, students.length);
-      setStudents((prev) => [enriched, ...prev]);
-      setSelectedStudentIds((prev) => [enriched.id, ...prev]);
+      const list = Array.isArray(newStudentsList) ? newStudentsList : [newStudentsList];
+      const enrichedList = list.map((item, idx) => enrichStudentData(item, students.length + idx));
+
+      setStudents((prev) => [...enrichedList, ...prev]);
+      setSelectedStudentIds((prev) => [...enrichedList.map((s) => s.id), ...prev]);
       setCurrentPreviewIndex(0);
 
       // Persist to backend SQLite database
+      const reportsPayload = enrichedList.map((enriched) => ({
+        id: enriched.id,
+        student_id: enriched.id,
+        student_name: enriched.name,
+        class_name: enriched.className,
+        year: enriched.year,
+        month: enriched.month,
+        exam_period: `${enriched.month} ${enriched.year}`,
+        curr_total: enriched.currTotal,
+        prev_total: enriched.prevTotal,
+        curr_math: enriched.currMath,
+        prev_math: enriched.prevMath,
+        absences: enriched.absences,
+        tardies: enriched.tardies,
+        discipline: enriched.discipline,
+        homework_submitted: enriched.homeworkSubmitted,
+        homework_total: enriched.homeworkTotal,
+        homework_rate: enriched.homeworkRate,
+        advisor_note: enriched.advisorNote,
+      }));
+
       fetch('http://localhost:5001/api/reports/batch', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          reports: [
-            {
-              id: enriched.id,
-              student_id: enriched.id,
-              student_name: enriched.name,
-              class_name: enriched.className,
-              year: enriched.year,
-              month: enriched.month,
-              exam_period: `${enriched.month} ${enriched.year}`,
-              curr_total: enriched.currTotal,
-              prev_total: enriched.prevTotal,
-              curr_math: enriched.currMath,
-              prev_math: enriched.prevMath,
-              absences: enriched.absences,
-              tardies: enriched.tardies,
-              discipline: enriched.discipline,
-              homework_submitted: enriched.homeworkSubmitted,
-              homework_total: enriched.homeworkTotal,
-              homework_rate: enriched.homeworkRate,
-              advisor_note: enriched.advisorNote,
-            },
-          ],
-        }),
+        body: JSON.stringify({ reports: reportsPayload }),
       }).catch((e) => {
         console.warn('Sync to backend db failed (working in client memory):', e.message);
       });
 
       setNotification({
         severity: 'success',
-        message: `دانش‌آموز "${enriched.name}" در ${enriched.className} با موفقیت ایجاد و ثبت شد.`,
+        message:
+          enrichedList.length === 1
+            ? `دانش‌آموز "${enrichedList[0].name}" با موفقیت ثبت شد.`
+            : `تعداد ${enrichedList.length} دانش‌آموز با شناسه‌های اختصاصی (UUID) با موفقیت اضافه شدند.`,
       });
     } catch (err) {
       setNotification({
         severity: 'error',
-        message: err.message || 'خطا در ثبت دانش‌آموز جدید.',
+        message: err.message || 'خطا در ثبت دانش‌آموزان جدید.',
       });
     }
   };
@@ -356,7 +359,7 @@ export default function App() {
       <CreateStudentModal
         open={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
-        onSaveStudent={handleSaveNewStudent}
+        onSaveStudents={handleSaveStudents}
         currentGradeName={currentGradeName}
         availableClasses={availableClasses}
       />

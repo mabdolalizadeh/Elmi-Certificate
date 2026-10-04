@@ -12,8 +12,9 @@ import {
   Chip,
   IconButton,
   Divider,
+  Alert,
 } from '@mui/material';
-import { FileSpreadsheet, X, Download, Calendar, Clock } from 'lucide-react';
+import { FileSpreadsheet, X, Download, Calendar, Clock, AlertTriangle, Users } from 'lucide-react';
 import {
   downloadExcelTemplate,
   SCHOOL_PERSIAN_MONTHS,
@@ -163,6 +164,41 @@ export default function DownloadTemplateModal({
             </Box>
           </Box>
 
+          {/* Student Status Notice */}
+          {existingStudents.length === 0 ? (
+            <Alert
+              severity="warning"
+              icon={<AlertTriangle size={20} />}
+              sx={{
+                borderRadius: 2.5,
+                fontWeight: 700,
+                fontSize: '0.85rem',
+                border: '1px solid #FDE68A',
+                bgcolor: '#FEFCE8',
+                color: '#92400E',
+                '& .MuiAlert-icon': { color: '#D97706' },
+              }}
+            >
+              هنوز هیچ دانش‌آموزی در سامانه تعریف نشده است. لطفاً ابتدا از طریق دکمه «+» در بالای صفحه، اسامی دانش‌آموزان را تعریف کنید تا شناسه یکتا (UUID) و نام آن‌ها در فایل اکسل قرار گیرد.
+            </Alert>
+          ) : (
+            <Alert
+              severity="success"
+              icon={<Users size={20} />}
+              sx={{
+                borderRadius: 2.5,
+                fontWeight: 700,
+                fontSize: '0.85rem',
+                border: '1px solid #BBF7D0',
+                bgcolor: '#F0FDF4',
+                color: '#166534',
+                '& .MuiAlert-icon': { color: '#16A34A' },
+              }}
+            >
+              تعداد {existingStudents.length} دانش‌آموز تعریف شده به همراه شناسه یکتا (UUID) و نام در فایل اکسل قرار خواهند گرفت.
+            </Alert>
+          )}
+
           {/* Template Format Preview Box */}
           <Box
             sx={{
@@ -193,18 +229,25 @@ export default function DownloadTemplateModal({
         <Button
           onClick={handleDownload}
           variant="contained"
+          disabled={existingStudents.length === 0}
           startIcon={<Download size={18} />}
           sx={{
             bgcolor: '#059669',
             '&:hover': { bgcolor: '#047857' },
+            '&.Mui-disabled': {
+              bgcolor: '#E2E8F0',
+              color: '#94A3B8',
+            },
             fontWeight: 800,
             px: 3,
             py: 1.1,
             borderRadius: 2.5,
-            boxShadow: '0 4px 14px rgba(5, 150, 105, 0.3)',
+            boxShadow: existingStudents.length > 0 ? '0 4px 14px rgba(5, 150, 105, 0.3)' : 'none',
           }}
         >
-          دریافت فایل اکسل ({selectedMonth} {selectedYear})
+          {existingStudents.length === 0
+            ? 'ابتدا دانش‌آموزان را ثبت کنید'
+            : `دریافت فایل اکسل (${selectedMonth} ${selectedYear})`}
         </Button>
       </DialogActions>
     </Dialog>
