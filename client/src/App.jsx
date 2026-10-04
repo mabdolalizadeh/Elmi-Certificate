@@ -18,14 +18,9 @@ import {
 export default function App() {
   const [selectedGrade, setSelectedGrade] = useState('7th');
 
-  // Initialize with sample 7th grade students so UI is immediately rich and interactive
-  const [students, setStudents] = useState(() =>
-    SAMPLE_STUDENTS.map((item, idx) => enrichStudentData(item, idx))
-  );
-
-  const [selectedStudentIds, setSelectedStudentIds] = useState(() =>
-    SAMPLE_STUDENTS.map((_, idx) => `student-${idx + 1}`)
-  );
+  // Initialize with empty array (no default/seed students)
+  const [students, setStudents] = useState([]);
+  const [selectedStudentIds, setSelectedStudentIds] = useState([]);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedClass, setSelectedClass] = useState('ALL');
