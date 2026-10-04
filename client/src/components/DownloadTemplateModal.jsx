@@ -20,14 +20,14 @@ import {
   SCHOOL_PERSIAN_MONTHS,
 } from '../utils/excelService';
 
-const AVAILABLE_YEARS = ['1403', '1404', '1405'];
+const AVAILABLE_YEARS = ['1405', '1406', '1407'];
 
 export default function DownloadTemplateModal({
   open,
   onClose,
   existingStudents = [],
 }) {
-  const [selectedYear, setSelectedYear] = useState('1403');
+  const [selectedYear, setSelectedYear] = useState('1405');
   const [selectedMonth, setSelectedMonth] = useState('آبان');
 
   const handleDownload = () => {
@@ -116,7 +116,7 @@ export default function DownloadTemplateModal({
               ))}
               <TextField
                 size="small"
-                placeholder="سال دلخواه (مثلاً 1404)"
+                placeholder="سال دلخواه (مثلاً 1405)"
                 value={selectedYear}
                 onChange={(e) => setSelectedYear(e.target.value)}
                 sx={{ width: 160 }}

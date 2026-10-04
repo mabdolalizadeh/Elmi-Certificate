@@ -80,7 +80,7 @@ export const SAMPLE_STUDENTS = [
     id: 'std-001',
     name: 'علیرضا حسینی',
     className: 'هفتم ۱',
-    year: '1403',
+    year: '1405',
     month: 'آذر',
     absences: 1,
     tardies: 2,
@@ -94,16 +94,16 @@ export const SAMPLE_STUDENTS = [
     currMath: 94,
     advisorNote: 'پیشرفت چشمگیر در درس ریاضی و استمرار عالی در ارسال تکالیف هفتگی. تمرکز بر تحلیل تست‌های زمان‌دار پیشنهاد می‌شود.',
     history: [
-      { month: 'مهر', year: '1403', total: 75, math: 70 },
-      { month: 'آبان', year: '1403', total: 82, math: 78 },
-      { month: 'آذر', year: '1403', total: 91, math: 94 },
+      { month: 'مهر', year: '1405', total: 75, math: 70 },
+      { month: 'آبان', year: '1405', total: 82, math: 78 },
+      { month: 'آذر', year: '1405', total: 91, math: 94 },
     ],
   },
   {
     id: 'std-002',
     name: 'محمد صادقی',
     className: 'هفتم ۱',
-    year: '1403',
+    year: '1405',
     month: 'آذر',
     absences: 4,
     tardies: 5,
@@ -117,16 +117,16 @@ export const SAMPLE_STUDENTS = [
     currMath: 58,
     advisorNote: 'افت در مباحث پایه ریاضی به همراه غیبت‌های مکرر. جلسه حضوری با اولیا جهت تنظیم برنامه مطالعاتی ضروری است.',
     history: [
-      { month: 'مهر', year: '1403', total: 80, math: 76 },
-      { month: 'آبان', year: '1403', total: 74, math: 70 },
-      { month: 'آذر', year: '1403', total: 67, math: 58 },
+      { month: 'مهر', year: '1405', total: 80, math: 76 },
+      { month: 'آبان', year: '1405', total: 74, math: 70 },
+      { month: 'آذر', year: '1405', total: 67, math: 58 },
     ],
   },
   {
     id: 'std-003',
     name: 'سارا رحیمی',
     className: 'هفتم ۲',
-    year: '1403',
+    year: '1405',
     month: 'آذر',
     absences: 0,
     tardies: 1,
@@ -140,16 +140,16 @@ export const SAMPLE_STUDENTS = [
     currMath: 86,
     advisorNote: 'عملکرد باثبات و رضایت‌بخش در تمامی دروس. برنامه‌ریزی برای آزمون‌های آزمایشی مرحله بعدی توصیه می‌شود.',
     history: [
-      { month: 'مهر', year: '1403', total: 84, math: 80 },
-      { month: 'آبان', year: '1403', total: 89, math: 85 },
-      { month: 'آذر', year: '1403', total: 90, math: 86 },
+      { month: 'مهر', year: '1405', total: 84, math: 80 },
+      { month: 'آبان', year: '1405', total: 89, math: 85 },
+      { month: 'آذر', year: '1405', total: 90, math: 86 },
     ],
   },
   {
     id: 'std-004',
     name: 'امیررضا کریمی',
     className: 'هفتم ۱',
-    year: '1403',
+    year: '1405',
     month: 'آذر',
     absences: 2,
     tardies: 3,
@@ -163,16 +163,16 @@ export const SAMPLE_STUDENTS = [
     currMath: 79,
     advisorNote: 'رشد مثبت در درصد ریاضی نسبت به دوره قبل. استمرار در حل تمرین‌های تشریحی باعث تثبیت نمرات خواهد شد.',
     history: [
-      { month: 'مهر', year: '1403', total: 72, math: 60 },
-      { month: 'آبان', year: '1403', total: 78, math: 65 },
-      { month: 'آذر', year: '1403', total: 84, math: 79 },
+      { month: 'مهر', year: '1405', total: 72, math: 60 },
+      { month: 'آبان', year: '1405', total: 78, math: 65 },
+      { month: 'آذر', year: '1405', total: 84, math: 79 },
     ],
   },
   {
     id: 'std-005',
     name: 'فاطمه نوری',
     className: 'هفتم ۲',
-    year: '1403',
+    year: '1405',
     month: 'آذر',
     absences: 1,
     tardies: 0,
@@ -186,16 +186,16 @@ export const SAMPLE_STUDENTS = [
     currMath: 72,
     advisorNote: 'کاهش تمرکز در بخش محاسباتی درس ریاضی. مرور خلاصه درس‌ها و شرکت در کلاس رفع اشکال پیشنهاد می‌گردد.',
     history: [
-      { month: 'مهر', year: '1403', total: 88, math: 85 },
-      { month: 'آبان', year: '1403', total: 85, math: 80 },
-      { month: 'آذر', year: '1403', total: 81, math: 72 },
+      { month: 'مهر', year: '1405', total: 88, math: 85 },
+      { month: 'آبان', year: '1405', total: 85, math: 80 },
+      { month: 'آذر', year: '1405', total: 81, math: 72 },
     ],
   },
   {
     id: 'std-006',
     name: 'پارسا مرادی',
     className: 'هفتم ۳',
-    year: '1403',
+    year: '1405',
     month: 'آذر',
     absences: 6,
     tardies: 8,
@@ -209,9 +209,9 @@ export const SAMPLE_STUDENTS = [
     currMath: 45,
     advisorNote: 'عدم ارسال به موقع تکالیف و غیبت‌های غیرموجه مکرر. نیاز فوری به پیگیری مشاوره تحصیلی و اخلاقی.',
     history: [
-      { month: 'مهر', year: '1403', total: 68, math: 62 },
-      { month: 'آبان', year: '1403', total: 62, math: 55 },
-      { month: 'آذر', year: '1403', total: 54, math: 45 },
+      { month: 'مهر', year: '1405', total: 68, math: 62 },
+      { month: 'آبان', year: '1405', total: 62, math: 55 },
+      { month: 'آذر', year: '1405', total: 54, math: 45 },
     ],
   },
 ];
@@ -307,7 +307,7 @@ export const enrichStudentData = (rawStudent, index = 0) => {
     rawStudent['سال'] ||
     rawStudent['سال تحصیلی'] ||
     rawStudent.year ||
-    '1403'
+    '1405'
   ).trim();
 
   const month = String(
@@ -369,7 +369,7 @@ export const enrichStudentData = (rawStudent, index = 0) => {
  * Generate and download an Excel template populated with:
  * 1. شناسه (UUID) (pre-filled)
  * 2. نام و نام خانوادگی (pre-filled)
- * 3. سال (pre-filled with selected year, e.g., 1403)
+ * 3. سال (pre-filled with selected year, e.g., 1405)
  * 4. ماه (pre-filled with selected month, e.g., آبان)
  * 5. درصد کل
  * 6. درصد ریاضی
@@ -382,7 +382,7 @@ export const enrichStudentData = (rawStudent, index = 0) => {
  */
 export const downloadExcelTemplate = ({
   className = '',
-  year = '1403',
+  year = '1405',
   month = 'آبان',
   studentList = [],
 } = {}) => {
@@ -533,8 +533,8 @@ export const parseExcelFile = (file) => {
         studentGroups.forEach((rows) => {
           // Sort chronologically by year and school calendar month
           rows.sort((a, b) => {
-            const yrA = String(a['سال'] || '1403');
-            const yrB = String(b['سال'] || '1403');
+            const yrA = String(a['سال'] || '1405');
+            const yrB = String(b['سال'] || '1405');
             const yrComp = yrA.localeCompare(yrB);
             if (yrComp !== 0) return yrComp;
             return getMonthOrderIndex(a['ماه']) - getMonthOrderIndex(b['ماه']);
@@ -543,7 +543,7 @@ export const parseExcelFile = (file) => {
           // History across all available exams
           const history = rows.map((r) => ({
             month: String(r['ماه'] || 'نامشخص').trim(),
-            year: String(r['سال'] || '1403').trim(),
+            year: String(r['سال'] || '1405').trim(),
             total: Number(r['درصد کل'] ?? r['درصد کل (فعلی)'] ?? 0),
             math: Number(r['درصد ریاضی'] ?? r['درصد ریاضی (فعلی)'] ?? 0),
           }));

@@ -72,7 +72,7 @@ export default function CreateStudentModal({
         id: uuid,
         name: name,
         className: targetClass,
-        year: '1403',
+        year: '1405',
         month: 'آبان',
         currTotal: 0,
         prevTotal: 0,

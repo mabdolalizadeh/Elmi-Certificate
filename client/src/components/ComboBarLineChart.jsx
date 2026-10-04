@@ -33,8 +33,8 @@ export default function ComboBarLineChart({
   if (Array.isArray(history) && history.length >= 2) {
     // Sort chronologically (earliest to latest)
     const sorted = [...history].sort((a, b) => {
-      const yrA = String(a.year || '1403');
-      const yrB = String(b.year || '1403');
+      const yrA = String(a.year || '1405');
+      const yrB = String(b.year || '1405');
       const yrComp = yrA.localeCompare(yrB);
       if (yrComp !== 0) return yrComp;
       return getMonthOrderIndex(a.month) - getMonthOrderIndex(b.month);
